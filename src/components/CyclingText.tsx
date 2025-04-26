@@ -11,11 +11,14 @@ const CyclingText: React.FC<CyclingTextProps> = ({ texts, cycleInterval = 2000 }
   
   // Colors for each word
   const colors = [
-    'text-blue-500',    // CS - Blue
-    'text-green-500',   // Business - Green
-    'text-purple-500',  // Marketing - Purple
-    'text-red-500',     // Law - Red
-    'text-yellow-600'   // Med - Amber
+    'text-blue-500',    // Networking
+    'text-green-500',   // Outreach
+    'text-purple-500',  // Cold Emails
+    'text-red-500',     // Follow-ups
+    'text-yellow-600',  // Job Hunting
+    'text-indigo-500',  // Resume Building
+    'text-pink-500',    // Interview Prep
+    'text-teal-500'     // Career Advice
   ];
   
   useEffect(() => {

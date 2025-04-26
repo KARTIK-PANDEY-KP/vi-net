@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 
@@ -38,9 +38,9 @@ const Navbar = () => {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
-          <a href="#how-it-works" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
-            How It Works
-          </a>
+          <Link to="/why" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
+            Why?
+          </Link>
           {/* <a href="#testimonials" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
             Case Studies
           </a>
@@ -50,9 +50,12 @@ const Navbar = () => {
           <a href="#pricing" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
             Pricing
           </a> */}
-          <a href="#cta" className="button-primary">
+          {/* <a href="#cta" className="button-primary">
             Get Started
-          </a>
+          </a> */}
+          <Link to="/onboarding" className="button-primary">
+            Join Waitlist
+          </Link>
         </div>
         
         {/* Mobile Menu Button */}
@@ -68,13 +71,13 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg py-4 px-6">
           <div className="flex flex-col space-y-4">
-            <a 
-              href="#how-it-works" 
+            <Link 
+              to="/why" 
               className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              How It Works
-            </a>
+              Why?
+            </Link>
             {/* <a 
               href="#testimonials" 
               className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors"
@@ -96,13 +99,20 @@ const Navbar = () => {
             >
               Pricing
             </a> */}
-            <a 
+            {/* <a 
               href="#cta" 
               className="button-primary w-full text-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Get Started
-            </a>
+            </a> */}
+            <Link 
+              to="/onboarding" 
+              className="button-primary w-full text-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Join Waitlist
+            </Link>
           </div>
         </div>
       )}

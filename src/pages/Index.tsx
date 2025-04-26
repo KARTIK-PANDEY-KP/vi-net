@@ -40,15 +40,16 @@ const Index = () => {
 
       <main className="pt-16">
         <Hero />
-        <ProblemStatement />
+        {/* <ProblemStatement />
         <HowItWorks />
-        <Testimonials />
+        <Testimonials /> */}
 
-        <section className="py-16 px-6" id="cta">
+        {/* CTA section removed */}
+        {/* <section className="py-16 px-6" id="cta">
           <div className="container mx-auto max-w-5xl">
             <div className="rounded-2xl overflow-hidden relative bg-convrt-dark-blue">
               {/* Background Image with Overlay */}
-              <div className="absolute inset-0 z-0">
+              {/* <div className="absolute inset-0 z-0">
                 <img
                   src="/lovable-uploads/eada8c8b-332c-4ac7-813d-42884f942368.png"
                   alt="Team Collaboration"
@@ -91,21 +92,6 @@ const Index = () => {
                     outbound with AI-driven social selling.
                   </p>
 
-                  <div className="flex flex-col space-y-3 mb-8">
-                    {[
-                      "15x higher response rates than cold outreach",
-                      "Build trust before your first message",
-                      "AI-driven personalization at scale",
-                    ].map((benefit, i) => (
-                      <div key={i} className="flex items-center">
-                        <Check className="w-5 h-5 text-convrt-purple mr-2 flex-shrink-0" />
-                        <span className="text-gray-100 text-sm font-medium">
-                          {benefit}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     whileInView={{ scale: 1, opacity: 1 }}
@@ -113,10 +99,10 @@ const Index = () => {
                     viewport={{ once: true }}
                   >
                     <Link
-                      to="/onboarding"
+                      to="/waitlist"
                       className="button-primary flex items-center text-lg px-8 py-4 shadow-lg shadow-convrt-purple/10 hover:shadow-xl hover:shadow-convrt-purple/20 rounded-full group"
                     >
-                      Start Free – No Credit Card Needed
+                      Join Waitlist
                       <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </motion.div>
@@ -124,7 +110,7 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <footer className="bg-white py-8 border-t border-gray-100">
@@ -141,7 +127,7 @@ const Index = () => {
                 Convrt.ai
               </h3>
               <p className="text-sm text-gray-600 mt-2">
-                © {new Date().getFullYear()} Convrt.ai. All rights reserved.
+                {new Date().getFullYear()} Convrt.ai. All rights reserved.
               </p>
             </motion.div>
 

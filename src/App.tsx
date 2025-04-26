@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import OnboardingScreen from "./pages/OnboardingScreen";
 import NotFound from "./pages/NotFound";
 import MentorDashboard from "./pages/MentorDashboard";
+import WaitlistSuccess from "./pages/WaitlistSuccess";
+import Why from "./pages/Why";
+// import Waitlist from "./pages/Waitlist"; // Waitlist page was removed
 
 const queryClient = new QueryClient();
 
@@ -18,6 +21,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/waitlist-success" element={<WaitlistSuccess />} />
+          <Route path="/why" element={<Why />} />
           <Route path="/onboarding" element={<OnboardingScreen />} />
           <Route path="/dashboard" element={<MentorDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
