@@ -1,0 +1,188 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-bot-user1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-bot-user1
+  template:
+    metadata:
+      labels:
+        app: flask-bot-user1
+    spec:
+      serviceAccountName: gke-pull-sa
+      imagePullSecrets:
+      - name: gcr-json-key
+      containers:
+      - name: flask
+        image: us-central1-docker.pkg.dev/la-hacks-457605/demo/flask-bot:latest
+        env:
+        - name: USER_ID
+          value: "user1"
+        ports:
+        - containerPort: 5000
+        - containerPort: 80  # for noVNC
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        volumeMounts:
+        - name: tls
+          mountPath: "/etc/nginx/ssl"
+          readOnly: true
+      volumes:
+      - name: tls
+        secret:
+          secretName: novnc-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-bot-user1-service
+spec:
+  type: ClusterIP
+  selector:
+    app: flask-bot-user1
+  ports:
+    - name: web
+      port: 80
+      targetPort: 5000
+    - name: novnc
+      port: 6081
+      targetPort: 6079
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-bot-user2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-bot-user2
+  template:
+    metadata:
+      labels:
+        app: flask-bot-user2
+    spec:
+      serviceAccountName: gke-pull-sa
+      imagePullSecrets:
+      - name: gcr-json-key
+      containers:
+      - name: flask
+        image: us-central1-docker.pkg.dev/la-hacks-457605/demo/flask-bot:latest
+        env:
+        - name: USER_ID
+          value: "user2"
+        ports:
+        - containerPort: 5000
+        - containerPort: 80  # for noVNC
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        volumeMounts:
+        - name: tls
+          mountPath: "/etc/nginx/ssl"
+          readOnly: true
+      volumes:
+      - name: tls
+        secret:
+          secretName: novnc-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-bot-user2-service
+spec:
+  type: ClusterIP
+  selector:
+    app: flask-bot-user2
+  ports:
+    - name: web
+      port: 80
+      targetPort: 5000
+    - name: novnc
+      port: 6081
+      targetPort: 6079
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-bot-user3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-bot-user3
+  template:
+    metadata:
+      labels:
+        app: flask-bot-user3
+    spec:
+      serviceAccountName: gke-pull-sa
+      imagePullSecrets:
+      - name: gcr-json-key
+      containers:
+      - name: flask
+        image: us-central1-docker.pkg.dev/la-hacks-457605/demo/flask-bot:latest
+        env:
+        - name: USER_ID
+          value: "user3"
+        ports:
+        - containerPort: 5000
+        - containerPort: 80  # for noVNC
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        volumeMounts:
+        - name: tls
+          mountPath: "/etc/nginx/ssl"
+          readOnly: true
+      volumes:
+      - name: tls
+        secret:
+          secretName: novnc-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-bot-user3-service
+spec:
+  type: ClusterIP
+  selector:
+    app: flask-bot-user3
+  ports:
+    - name: web
+      port: 80
+      targetPort: 5000
+    - name: novnc
+      port: 6081
+      targetPort: 6079 

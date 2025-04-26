@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: novnc-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "true"
+    ingress.gcp.kubernetes.io/pre-shared-cert: "novnc-tls"
+    ingress.kubernetes.io/backends-protocol: "HTTP"
+    ingress.kubernetes.io/health-check-path: "/health"
+spec:
+  defaultBackend:
+    service:
+      name: flask-bot-user1-service
+      port:
+        number: 80
+  rules:
+  - http:
+      paths:
+      - path: /user2/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flask-bot-user2-service
+            port:
+              number: 80
+      - path: /user3/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flask-bot-user3-service
+            port:
+              number: 80 
