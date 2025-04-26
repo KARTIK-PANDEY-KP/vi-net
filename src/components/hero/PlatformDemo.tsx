@@ -28,7 +28,7 @@ const PlatformDemo: React.FC = () => {
             className="w-full h-full object-cover object-center"
             style={{ display: 'block', width: '110%', minHeight: '500px' }}
           >
-            <source src="/src/assets/demovid3.mp4" type="video/mp4" />
+            <source src="/src/assets/demovid4.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
