@@ -41,7 +41,7 @@ const Navbar = () => {
           <a href="#how-it-works" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
             How It Works
           </a>
-          <a href="#testimonials" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
+          {/* <a href="#testimonials" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
             Case Studies
           </a>
           <a href="#product" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
@@ -49,7 +49,7 @@ const Navbar = () => {
           </a>
           <a href="#pricing" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
             Pricing
-          </a>
+          </a> */}
           <a href="#cta" className="button-primary">
             Get Started
           </a>
@@ -75,7 +75,7 @@ const Navbar = () => {
             >
               How It Works
             </a>
-            <a 
+            {/* <a 
               href="#testimonials" 
               className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -95,7 +95,7 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Pricing
-            </a>
+            </a> */}
             <a 
               href="#cta" 
               className="button-primary w-full text-center"
