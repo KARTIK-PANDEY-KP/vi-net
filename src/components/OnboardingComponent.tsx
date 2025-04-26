@@ -19,7 +19,7 @@ const OnboardingComponent = () => {
   });
   const [isGoogleConnected, setIsGoogleConnected] = useState(false);
 
-  const totalSteps = 4;
+  const totalSteps = 3; // Reduced from 4 to 3 (removed scheduling step)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -109,7 +109,7 @@ const OnboardingComponent = () => {
                   Welcome to <span className="text-convrt-purple">Convrt.ai</span>
                 </h1>
                 <p className="text-convrt-dark-blue/80 max-w-lg mx-auto">
-                  First, let's connect your Google account to access your contacts and calendar. This will help us provide you with the best experience.
+                  First, let's connect your Google account. This will help us provide you with the best experience.
                 </p>
               </div>
 
@@ -165,9 +165,6 @@ const OnboardingComponent = () => {
             <div className="space-y-6">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-convrt-dark-blue mb-2">Personal Information</h2>
-                <p className="text-convrt-dark-blue/70">
-                  Tell us a bit about yourself so we can personalize your experience.
-                </p>
               </div>
 
               <div className="space-y-4">
@@ -207,80 +204,12 @@ const OnboardingComponent = () => {
             </div>
           )}
 
-          {/* Step 3: Scheduling Links */}
+          {/* Step 3: Scheduling Links - COMMENTED OUT
+          Step 3 has been removed to simplify the onboarding process
+          */}
+
+          {/* Step 3: Resume Upload - Changed from Step 4 */}
           {step === 3 && (
-            <div className="space-y-6">
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-convrt-dark-blue mb-2">Scheduling Information</h2>
-                <p className="text-convrt-dark-blue/70">
-                  Add your scheduling links to make it easy for prospects to connect with you.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="calendlyLink" className="block text-sm font-medium text-convrt-dark-blue mb-1">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2 text-convrt-purple" />
-                      Calendly Link
-                    </div>
-                  </label>
-                  <input
-                    type="url"
-                    id="calendlyLink"
-                    name="calendlyLink"
-                    value={formData.calendlyLink}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-convrt-purple/50 focus:border-convrt-purple"
-                    placeholder="https://calendly.com/yourname"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    This will be used to schedule meetings with your prospects.
-                  </p>
-                </div>
-
-                <div>
-                  <label htmlFor="zoomLink" className="block text-sm font-medium text-convrt-dark-blue mb-1">
-                    <div className="flex items-center">
-                      <Video className="h-4 w-4 mr-2 text-convrt-purple" />
-                      Zoom Link
-                    </div>
-                  </label>
-                  <input
-                    type="url"
-                    id="zoomLink"
-                    name="zoomLink"
-                    value={formData.zoomLink}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-convrt-purple/50 focus:border-convrt-purple"
-                    placeholder="https://zoom.us/j/yourpersonallink"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Your personal meeting room link for virtual meetings.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-between mt-8">
-                <button 
-                  className="border border-gray-300 text-convrt-dark-blue font-medium py-3 px-6 rounded-lg transition-all hover:bg-gray-50"
-                  onClick={prevStep}
-                >
-                  Back
-                </button>
-                <button 
-                  className="button-primary flex items-center"
-                  onClick={nextStep}
-                >
-                  Continue
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Step 4: Resume Upload */}
-          {step === 4 && (
             <div className="space-y-6">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-convrt-dark-blue mb-2">Upload Your Resume</h2>
