@@ -31,10 +31,11 @@ LINKD_API_KEY = os.getenv('LINKD_API_KEY')
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-
+# Using only basic profile scopes that don't require verification
 SCOPES = [
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.readonly'
+    'openid',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email'
 ]
 
 app = Flask(__name__)
@@ -82,7 +83,7 @@ def home():
         <form action="/login" method="get">
             <label for="username">Choose a username:</label><br>
             <input type="text" id="username" name="username" required><br><br>
-            <input type="submit" value="Login with Google">
+            <input type="submit" value="Sign in with Google">
         </form>
     '''
 
@@ -100,7 +101,11 @@ def login():
         scopes=SCOPES,
         redirect_uri=url_for('oauth2callback', _external=True)
     )
-    auth_url, _ = flow.authorization_url(prompt='consent', include_granted_scopes='true')
+    auth_url, _ = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        prompt='consent'
+    )
     return redirect(auth_url)
 
 
@@ -114,47 +119,52 @@ def oauth2callback():
     flow.fetch_token(authorization_response=request.url)
 
     credentials = flow.credentials
-    access_token = credentials.token
-    refresh_token = credentials.refresh_token
-    token_expiry = credentials.expiry.isoformat()
-
-    service = build('gmail', 'v1', credentials=credentials)
-    profile = service.users().getProfile(userId='me').execute()
-    email = profile['emailAddress']
+    
+    # Get user info using OAuth2 API
+    userinfo_service = build('oauth2', 'v2', credentials=credentials)
+    user_info = userinfo_service.userinfo().get().execute()
+    email = user_info.get('email')
 
     username = session.get('custom_username')
     if not username:
         return "❌ Missing username from session", 400
 
-    user_id = username
-
+    # Store only basic profile info and credentials
     db = get_firestore_client()
-    db.collection("users").document(user_id).set({
+    db.collection("users").document(username).set({
         "email": email,
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_expiry": token_expiry
+        "name": user_info.get('name'),
+        "picture": user_info.get('picture'),
+        "access_token": credentials.token,
+        "refresh_token": credentials.refresh_token,
+        "token_expiry": credentials.expiry.isoformat() if credentials.expiry else None
     })
 
-    # Return a form with two text fields
+    # Return form with meeting link instead of specific Calendly link
     return render_template_string('''
         <h2>✅ Auth successful for {{ username }}!</h2>
-        <p>Please provide your resume and additional details:</p>
+        <p>Please provide your resume, additional details, and meeting link:</p>
         
         <form action="/complete_profile" method="post">
             <input type="hidden" name="username" value="{{ username }}">
             
-            <div>
+            <div style="margin-bottom: 20px;">
                 <label for="resume">Resume Text:</label><br>
                 <textarea id="resume" name="resume" rows="15" required style="width: 100%;"></textarea>
             </div>
             
-            <div>
+            <div style="margin-bottom: 20px;">
                 <label for="additional_details">Additional Details:</label><br>
                 <textarea id="additional_details" name="additional_details" rows="10" style="width: 100%;"></textarea>
             </div>
             
-            <button type="submit">Save</button>
+            <div style="margin-bottom: 20px;">
+                <label for="meeting_link">Meeting Link:</label><br>
+                <input type="text" id="meeting_link" name="meeting_link" style="width: 100%;" 
+                       placeholder="Your meeting scheduling link">
+            </div>
+            
+            <button type="submit" style="padding: 10px 20px; background-color: #0366d6; color: white; border: none; border-radius: 5px; cursor: pointer;">Save Profile</button>
         </form>
     ''', username=username)
 
@@ -168,6 +178,7 @@ def complete_profile():
     # Get form data
     resume_text = request.form.get('resume', '')
     additional_details = request.form.get('additional_details', '')
+    meeting_link = request.form.get('meeting_link', '')
 
     # Store in Firestore
     db = get_firestore_client()
@@ -180,6 +191,7 @@ def complete_profile():
         user_ref.set({
             "resume_text": resume_text,
             "additional_details": additional_details,
+            "meeting_link": meeting_link,
             "profile_completed": True
         })
     else:
@@ -187,10 +199,11 @@ def complete_profile():
         user_ref.update({
             "resume_text": resume_text,
             "additional_details": additional_details,
+            "meeting_link": meeting_link,
             "profile_completed": True
         })
 
-    return "✅ Saved"
+    return "✅ Profile saved successfully!"
 
 
 @app.route('/send_email', methods=['POST'])
