@@ -13,6 +13,7 @@ from google_search import perform_google_search
 import logging
 import requests
 import json
+import urllib.parse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -357,6 +358,49 @@ def search_people():
         
     except Exception as e:
         logger.error(f"Error in search_people: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get_email', methods=['POST'])
+def get_email():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No JSON data received"}), 400
+        first_name = data.get("first_name")
+        last_name = data.get("last_name")
+        linkedin_url = data.get("linkedin_url")
+        if not first_name or not last_name or not linkedin_url:
+            return jsonify({"error": "Missing required fields: first_name, last_name, linkedin_url"}), 400
+
+        encoded_profile = urllib.parse.quote(linkedin_url, safe='')
+        url = (f"https://api.apollo.io/api/v1/people/match?first_name={first_name}"
+               f"&last_name={last_name}&linkedin_url={encoded_profile}&"
+               "reveal_personal_emails=true&reveal_phone_number=false")
+
+        headers = {
+            "accept": "application/json",
+            "Cache-Control": "no-cache",
+            "Content-Type": "application/json",
+            "x-api-key": os.getenv("APOLLO_API_KEY")
+        }
+
+        response = requests.post(url, headers=headers)
+        if response.status_code != 200:
+            logger.error(f"Apollo API error: {response.text}")
+            return jsonify({
+                "error": "Failed to fetch email from Apollo API",
+                "status_code": response.status_code,
+                "details": response.text
+            }), response.status_code
+
+        # Parse and return only the email
+        result = response.json()
+        email = result.get("person", {}).get("email")
+        if not email:
+            return jsonify({"error": "Email not found"}), 404
+        return jsonify({"email": email})
+    except Exception as e:
+        logger.error(f"Error in get_email: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

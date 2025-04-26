@@ -25,7 +25,13 @@ pip install -r requirements.txt
 
 ---
 
-### 3. Set up Google Cloud Project
+### 3. Set up Google Cloud Projectcurl -X POST http://localhost:8080/get_email \
+     -H "Content-Type: application/json" \
+     -d '{
+           "first_name": "Pranav",
+           "last_name": "Subbaraman",
+           "linkedin_url": "[https://www.linkedin.com/in/pranav-subbaraman/"](https://www.linkedin.com/in/pranav-subbaraman/")
+         }'
 
 #### a. 🔐 Enable Gmail API and Firestore API
 Go to [Google Cloud Console](https://console.cloud.google.com/):
