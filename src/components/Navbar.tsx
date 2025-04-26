@@ -38,7 +38,7 @@ const Navbar = () => {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/why" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
+          <Link to="/why" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2">
             Why?
           </Link>
           {/* <a href="#testimonials" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
@@ -73,7 +73,7 @@ const Navbar = () => {
           <div className="flex flex-col space-y-4">
             <Link 
               to="/why" 
-              className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors"
+              className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2 inline-block"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Why?

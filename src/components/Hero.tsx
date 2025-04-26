@@ -98,21 +98,22 @@ const Hero = ({ showCTA = true }: { showCTA?: boolean }) => {
           )}
 
           {/* Modern Platform Showcase */}
-          <div className="mt-24 relative">
+          <div className="mt-28 relative">
             {/* Decorative background effect */}
-            <div className="absolute inset-0 -m-6 bg-gradient-to-br from-convrt-purple/20 via-convrt-purple/20 to-convrt-purple/20 rounded-3xl blur-3xl opacity-40"></div>
+            <div className="absolute inset-0 -m-10 bg-gradient-to-br from-convrt-purple/20 via-convrt-purple/20 to-convrt-purple/20 rounded-3xl blur-3xl opacity-40"></div>
             
-            {/* Device frame effect */}
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-black/5 mx-auto" style={{ maxWidth: '900px', padding: '16px' }}>
+            {/* Device frame effect - Increased size */}
+            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-black/5 mx-auto" 
+                 style={{ maxWidth: '1200px', padding: '20px', margin: '0 -4rem' }}>
               {/* Inner frame effect */}
-              <div className="relative z-10 rounded-2xl overflow-hidden bg-white/2 border border-white/10 shadow-inner">
+              <div className="relative z-10 rounded-[1.75rem] overflow-hidden bg-white/2 border border-white/10 shadow-inner">
                 <video 
                   autoPlay 
                   loop 
                   muted 
                   playsInline
                   className="w-full h-full object-cover"
-                  style={{ display: 'block', width: '100%', minHeight: '500px' }}
+                  style={{ display: 'block', width: '100%', minHeight: '650px' }}
                 >
                   <source src="/src/assets/demovid3.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
