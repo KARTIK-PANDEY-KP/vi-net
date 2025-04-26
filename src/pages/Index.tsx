@@ -33,7 +33,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-convrt-dark-blue overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-project-dave-dark-blue overflow-hidden">
       <div className="fixed w-full z-50">
         <Navbar />
       </div>
@@ -124,10 +124,10 @@ const Index = () => {
               className="mb-6 md:mb-0"
             >
               <h3 className="text-2xl font-bold text-convrt-dark-blue">
-                Convrt.ai
+                project dave
               </h3>
               <p className="text-sm text-gray-600 mt-2">
-                {new Date().getFullYear()} Convrt.ai. All rights reserved.
+                {new Date().getFullYear()} project dave. All rights reserved.
               </p>
             </motion.div>
 

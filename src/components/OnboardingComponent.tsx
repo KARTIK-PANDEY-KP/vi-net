@@ -13,13 +13,12 @@ const OnboardingComponent = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: '',
-    calendlyLink: '',
-    zoomLink: '',
-    resume: null
+    resume: null,
+    additionalDetails: ''
   });
   const [isGoogleConnected, setIsGoogleConnected] = useState(false);
 
-  const totalSteps = 3; // Reduced from 4 to 3 (removed scheduling step)
+  const totalSteps = 2; // Only 2 steps: Google Connect and Resume Upload
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,8 +38,9 @@ const OnboardingComponent = () => {
   };
 
   const nextStep = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
+    // Skip directly to resume upload if connected to Google
+    if (isGoogleConnected && formData.fullName && step === 1) {
+      setStep(2); // Go directly to resume upload
     }
   };
 
@@ -52,6 +52,13 @@ const OnboardingComponent = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if resume is uploaded (required)
+    if (!formData.resume) {
+      alert('Please upload your resume to continue');
+      return;
+    }
+    
     // In a real app, this would submit the data to a backend
     console.log('Form submitted:', formData);
     // Redirect to dashboard or confirmation page
@@ -60,19 +67,17 @@ const OnboardingComponent = () => {
 
   return (
     <div className="min-h-screen bg-[#F9F6F3] flex flex-col">
-      {/* Header */}
+      {/* Simplified Navbar for Onboarding */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <a href="/" className="flex items-center">
+        <div className="container mx-auto flex justify-start items-center">
+          <a href="/" className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/ce207080-f6c2-430d-9621-79d32ab08655.png" 
-              alt="Convrt.ai Logo" 
-              className="h-8"
+              src="src/assets/logo.png" 
+              alt="project dave logo" 
+              className="h-12 md:h-14"
             />
+            <span className="font-medium text-project-dave-dark-blue text-lg">project dave</span>
           </a>
-          <button className="text-convrt-dark-blue/60 text-sm hover:text-convrt-purple">
-            Need help?
-          </button>
         </div>
       </header>
 
@@ -80,16 +85,16 @@ const OnboardingComponent = () => {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-convrt-dark-blue">
+            <span className="text-sm font-medium text-project-dave-dark-blue">
               Step {step} of {totalSteps}
             </span>
-            <span className="text-sm font-medium text-convrt-purple">
+            <span className="text-sm font-medium text-project-dave-purple">
               {Math.round((step / totalSteps) * 100)}% Complete
             </span>
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-convrt-purple rounded-full transition-all duration-300 ease-in-out" 
+              className="h-full bg-project-dave-purple rounded-full transition-all duration-300 ease-in-out" 
               style={{ width: `${(step / totalSteps) * 100}%` }}
             ></div>
           </div>
@@ -101,22 +106,45 @@ const OnboardingComponent = () => {
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center px-4 py-2 rounded-full bg-convrt-purple/10 text-convrt-purple mb-4">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-project-dave-purple/10 text-project-dave-purple mb-4">
                   <Sparkles className="w-4 h-4 mr-2" />
                   <span className="text-sm font-medium">Let's Get Started</span>
                 </div>
-                <h1 className="text-3xl font-bold text-convrt-dark-blue mb-4">
-                  Welcome to <span className="text-convrt-purple">Convrt.ai</span>
+                <h1 className="text-3xl font-bold text-project-dave-dark-blue mb-4">
+                  Welcome to <span className="text-project-dave-purple">project dave</span>
                 </h1>
-                <p className="text-convrt-dark-blue/80 max-w-lg mx-auto">
-                  First, let's connect your Google account. This will help us provide you with the best experience.
+                <p className="text-project-dave-dark-blue/80 max-w-lg mx-auto">
+                  Enter your name and connect to your Google account.
                 </p>
               </div>
 
-              <div className="flex flex-col items-center justify-center py-8">
+              <div className="flex flex-col items-center justify-center space-y-4 py-8">
+                {/* Name input field */}
+                <div className="w-full max-w-sm">
+                  <label htmlFor="fullName" className="block text-sm font-medium text-project-dave-dark-blue mb-1">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-project-dave-purple/50 focus:border-project-dave-purple"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+                
+                {/* Connect with Google button - now goes directly to resume page */}
                 <button 
-                  className="flex items-center justify-center gap-3 w-full max-w-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg py-3 px-4 shadow-sm transition-all duration-200"
-                  onClick={() => setIsGoogleConnected(true)}
+                  onClick={() => {
+                    if (formData.fullName) {
+                      setIsGoogleConnected(true);
+                      setStep(2); // Go directly to resume page
+                    }
+                  }}
+                  className={`flex items-center justify-center gap-3 w-full max-w-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg py-3 px-4 shadow-sm transition-all duration-200 ${!formData.fullName ? 'opacity-50 pointer-events-none' : ''}`}
                 >
                   <svg viewBox="0 0 24 24" width="24" height="24" className="mr-2">
                     <path
@@ -138,82 +166,23 @@ const OnboardingComponent = () => {
                   </svg>
                   <span className="font-medium">Connect with Google</span>
                 </button>
-
-                {isGoogleConnected && (
-                  <div className="mt-6 flex items-center text-green-600 bg-green-50 px-4 py-2 rounded-full">
-                    <Check className="h-4 w-4 mr-2" />
-                    <span className="text-sm font-medium">Google account connected successfully!</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end mt-8">
-                <button 
-                  className="button-primary flex items-center"
-                  onClick={nextStep}
-                  disabled={!isGoogleConnected}
-                >
-                  Continue
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </button>
+                
               </div>
             </div>
           )}
 
-          {/* Step 2: Basic Information */}
-          {step === 2 && (
-            <div className="space-y-6">
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-convrt-dark-blue mb-2">Personal Information</h2>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="fullName" className="block text-sm font-medium text-convrt-dark-blue mb-1">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-convrt-purple/50 focus:border-convrt-purple"
-                    placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-between mt-8">
-                <button 
-                  className="border border-gray-300 text-convrt-dark-blue font-medium py-3 px-6 rounded-lg transition-all hover:bg-gray-50"
-                  onClick={prevStep}
-                >
-                  Back
-                </button>
-                <button 
-                  className="button-primary flex items-center"
-                  onClick={nextStep}
-                  disabled={!formData.fullName}
-                >
-                  Continue
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Step 2: Resume Upload (was previously Step 4) */}
 
           {/* Step 3: Scheduling Links - COMMENTED OUT
           Step 3 has been removed to simplify the onboarding process
           */}
 
-          {/* Step 3: Resume Upload - Changed from Step 4 */}
-          {step === 3 && (
+          {/* Step 2: Resume Upload */}
+          {step === 2 && (
             <div className="space-y-6">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-convrt-dark-blue mb-2">Upload Your Resume</h2>
-                <p className="text-convrt-dark-blue/70">
+                <h2 className="text-2xl font-bold text-project-dave-dark-blue mb-2">Upload Your Resume <span className="text-red-500">*</span></h2>
+                <p className="text-project-dave-dark-blue/70">
                   Your resume helps us understand your expertise and industry focus.
                 </p>
               </div>
@@ -222,10 +191,10 @@ const OnboardingComponent = () => {
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                   {!formData.resume ? (
                     <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 bg-convrt-purple/10 rounded-full flex items-center justify-center mb-4">
-                        <Upload className="h-8 w-8 text-convrt-purple" />
+                      <div className="w-16 h-16 bg-project-dave-purple/10 rounded-full flex items-center justify-center mb-4">
+                        <Upload className="h-8 w-8 text-project-dave-purple" />
                       </div>
-                      <p className="text-convrt-dark-blue font-medium mb-2">
+                      <p className="text-project-dave-dark-blue font-medium mb-2">
                         Drag and drop your resume here
                       </p>
                       <p className="text-gray-500 text-sm mb-4">
@@ -242,13 +211,13 @@ const OnboardingComponent = () => {
                       </label>
                     </div>
                   ) : (
-                    <div className="bg-convrt-purple/5 p-4 rounded-lg flex items-center justify-between">
+                    <div className="bg-project-dave-purple/5 p-4 rounded-lg flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-convrt-purple/10 rounded-lg flex items-center justify-center mr-3">
-                          <Check className="h-5 w-5 text-convrt-purple" />
+                        <div className="w-10 h-10 bg-project-dave-purple/10 rounded-lg flex items-center justify-center mr-3">
+                          <Check className="h-5 w-5 text-project-dave-purple" />
                         </div>
                         <div className="text-left">
-                          <p className="text-convrt-dark-blue font-medium">{formData.resume.name}</p>
+                          <p className="text-project-dave-dark-blue font-medium">{formData.resume.name}</p>
                           <p className="text-xs text-gray-500">
                             {Math.round(formData.resume.size / 1024)} KB
                           </p>
@@ -265,13 +234,23 @@ const OnboardingComponent = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between mt-8">
-                <button 
-                  className="border border-gray-300 text-convrt-dark-blue font-medium py-3 px-6 rounded-lg transition-all hover:bg-gray-50"
-                  onClick={prevStep}
-                >
-                  Back
-                </button>
+              {/* Additional Details Textarea (Optional) */}
+              <div className="space-y-2 mt-6">
+                <label htmlFor="additionalDetails" className="block text-sm font-medium text-project-dave-dark-blue">
+                  Additional Details (Optional)
+                </label>
+                <textarea
+                  id="additionalDetails"
+                  name="additionalDetails"
+                  value={formData.additionalDetails}
+                  onChange={(e) => setFormData(prev => ({ ...prev, additionalDetails: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-project-dave-purple/50 focus:border-project-dave-purple"
+                  rows={4}
+                  placeholder="Share any additional information that might help us understand your goals better"
+                ></textarea>
+              </div>
+
+              <div className="flex justify-end mt-8">
                 <button 
                   className="button-primary flex items-center"
                   onClick={handleSubmit}
@@ -285,8 +264,8 @@ const OnboardingComponent = () => {
         </div>
 
         {/* Help Text */}
-        <div className="mt-8 text-center text-sm text-convrt-dark-blue/60">
-          Having trouble? <a href="#" className="text-convrt-purple hover:underline">Contact our support team</a>
+        <div className="mt-8 text-center text-sm text-project-dave-dark-blue/60">
+          Having trouble? <a href="mailto:danielwu28@g.ucla.edu" className="text-project-dave-purple hover:underline">Contact our support team</a>
         </div>
       </div>
     </div>

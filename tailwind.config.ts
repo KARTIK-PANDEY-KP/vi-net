@@ -53,7 +53,7 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        convrt: {
+        "project-dave": {
           "dark-blue": "#222233",
           "purple": "#6936F5",
           "purple-hover": "#5828E0",

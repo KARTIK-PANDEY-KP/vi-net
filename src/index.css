@@ -74,19 +74,19 @@
   }
   
   .glass-dark {
-    @apply bg-convrt-dark-blue/70 backdrop-blur-lg border border-white/10 rounded-2xl;
+    @apply bg-project-dave-dark-blue/70 backdrop-blur-lg border border-white/10 rounded-2xl;
   }
   
   .button-primary {
-    @apply bg-convrt-purple text-white font-semibold py-3 px-6 rounded-lg transition-all hover:bg-convrt-purple-hover hover:shadow-lg hover:shadow-convrt-purple/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+    @apply bg-project-dave-purple text-white font-semibold py-3 px-6 rounded-lg transition-all hover:bg-project-dave-purple-hover hover:shadow-lg hover:shadow-project-dave-purple/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
   
   .button-secondary {
-    @apply bg-convrt-dark-blue text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg hover:shadow-convrt-dark-blue/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+    @apply bg-project-dave-dark-blue text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg hover:shadow-project-dave-dark-blue/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
   
   .button-outline {
-    @apply border border-gray-300 bg-white/50 backdrop-blur-sm text-convrt-dark-blue font-medium py-3 px-6 rounded-lg transition-all hover:bg-convrt-light-gray hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+    @apply border border-gray-300 bg-white/50 backdrop-blur-sm text-project-dave-dark-blue font-medium py-3 px-6 rounded-lg transition-all hover:bg-project-dave-light-gray hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
   
   .heading-xl {
@@ -110,15 +110,15 @@
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-convrt-purple via-convrt-purple-light to-convrt-purple bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-project-dave-purple via-project-dave-purple-light to-project-dave-purple bg-clip-text text-transparent;
   }
   
   .section-tag {
-    @apply inline-flex items-center px-3 py-1 rounded-full bg-convrt-purple/5 text-convrt-purple text-sm font-medium mb-4;
+    @apply inline-flex items-center px-3 py-1 rounded-full bg-project-dave-purple/5 text-project-dave-purple text-sm font-medium mb-4;
   }
   
   .feature-card {
-    @apply relative p-6 rounded-2xl bg-white border border-convrt-light-gray/60 transition-all duration-300 hover:shadow-xl hover:shadow-convrt-purple/5 hover:border-convrt-purple/20 hover:-translate-y-1;
+    @apply relative p-6 rounded-2xl bg-white border border-project-dave-light-gray/60 transition-all duration-300 hover:shadow-xl hover:shadow-project-dave-purple/5 hover:border-project-dave-purple/20 hover:-translate-y-1;
   }
   
   .animate-delay-100 {

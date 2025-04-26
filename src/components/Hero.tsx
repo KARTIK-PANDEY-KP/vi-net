@@ -45,7 +45,7 @@ const Hero = ({ showCTA = true }: { showCTA?: boolean }) => {
         >
           {/* <motion.div
             variants={itemVariants}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-convrt-purple/10 text-convrt-purple mb-6"
+            className="inline-flex items-center px-4 py-2 rounded-full bg-project-dave-purple/10 text-project-dave-purple mb-6"
           >
             <Zap className="w-4 h-4 mr-2" />
             <span className="text-sm font-medium font-inter tracking-wide">
@@ -55,7 +55,7 @@ const Hero = ({ showCTA = true }: { showCTA?: boolean }) => {
 
           <motion.h1
             variants={itemVariants}
-            className="flex justify-center items-center whitespace-nowrap font-inter font-bold text-4xl md:text-5xl lg:text-7xl tracking-tight max-w-4xl mx-auto mb-6 text-convrt-dark-blue"
+            className="flex justify-center items-center whitespace-nowrap font-inter font-bold text-4xl md:text-5xl lg:text-7xl tracking-tight max-w-4xl mx-auto mb-6 text-project-dave-dark-blue"
           >
             F**k&nbsp;
             <CyclingText texts={[
@@ -69,7 +69,7 @@ const Hero = ({ showCTA = true }: { showCTA?: boolean }) => {
 
           <motion.p
             variants={itemVariants}
-            className="font-inter text-xl text-convrt-dark-blue/80 max-w-3xl mx-auto mb-8 leading-relaxed"
+            className="font-inter text-xl text-project-dave-dark-blue/80 max-w-3xl mx-auto mb-8 leading-relaxed"
           >
             Cut the crap. Focus on real human interactions.
           </motion.p>
@@ -100,7 +100,7 @@ const Hero = ({ showCTA = true }: { showCTA?: boolean }) => {
           {/* Modern Platform Showcase */}
           <div className="mt-28 relative">
             {/* Decorative background effect */}
-            <div className="absolute inset-0 -m-10 bg-gradient-to-br from-convrt-purple/20 via-convrt-purple/20 to-convrt-purple/20 rounded-3xl blur-3xl opacity-40"></div>
+            <div className="absolute inset-0 -m-10 bg-gradient-to-br from-project-dave-purple/20 via-project-dave-purple/20 to-project-dave-purple/20 rounded-3xl blur-3xl opacity-40"></div>
             
             {/* Device frame effect - Increased size */}
             <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-black/5 mx-auto" 

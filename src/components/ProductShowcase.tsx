@@ -40,7 +40,7 @@ const ProductShowcase = () => {
         >
           <motion.h2 
             variants={itemVariants}
-            className="text-4xl md:text-5xl font-semibold text-convrt-dark-blue mb-6 tracking-tight"
+            className="text-4xl md:text-5xl font-semibold text-project dave-dark-blue mb-6 tracking-tight"
           >
             The First AI Organic Outbound Platform
           </motion.h2>
@@ -70,12 +70,12 @@ const ProductShowcase = () => {
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
               </div>
-              <div className="text-sm text-gray-500">convrt.ai/dashboard</div>
+              <div className="text-sm text-gray-500">projectdave.ai/dashboard</div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
               <div className="flex flex-col justify-center">
-                <h3 className="text-2xl font-semibold text-convrt-dark-blue mb-4">
+                <h3 className="text-2xl font-semibold text-project dave-dark-blue mb-4">
                   Intelligent AI Analysis
                 </h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
@@ -106,7 +106,7 @@ const ProductShowcase = () => {
                       <path d="M13 16a3 3 0 1 0 0-6"></path>
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-convrt-dark-blue">Insights Report</h3>
+                  <h3 className="text-lg font-semibold text-project dave-dark-blue">Insights Report</h3>
                 </div>
                 
                 <div className="space-y-4">

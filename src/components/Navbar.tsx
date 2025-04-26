@@ -27,27 +27,28 @@ const Navbar = () => {
     >
       <div className="container max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
-          <a href="/" className="flex items-center">
+          <a href="/" className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/ce207080-f6c2-430d-9621-79d32ab08655.png" 
-              alt="Convrt.ai Logo" 
-              className="h-8 md:h-10"
+              src="src/assets/logo.png" 
+              alt="project dave logo" 
+              className="h-12 md:h-14"
             />
+            <span className="font-medium text-project-dave-dark-blue text-lg">project dave</span>
           </a>
         </div>
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/why" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2">
+          <Link to="/why" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2">
             Why?
           </Link>
-          {/* <a href="#testimonials" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
+          {/* <a href="#testimonials" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors">
             Case Studies
           </a>
-          <a href="#product" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
+          <a href="#product" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors">
             Product
           </a>
-          <a href="#pricing" className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors">
+          <a href="#pricing" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors">
             Pricing
           </a> */}
           {/* <a href="#cta" className="button-primary">
@@ -60,7 +61,7 @@ const Navbar = () => {
         
         {/* Mobile Menu Button */}
         <button 
-          className="md:hidden text-convrt-dark-blue" 
+          className="md:hidden text-project-dave-dark-blue" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -73,28 +74,28 @@ const Navbar = () => {
           <div className="flex flex-col space-y-4">
             <Link 
               to="/why" 
-              className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2 inline-block"
+              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2 inline-block"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Why?
             </Link>
             {/* <a 
               href="#testimonials" 
-              className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors"
+              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Case Studies
             </a>
             <a 
               href="#product" 
-              className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors"
+              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Product
             </a>
             <a 
               href="#pricing" 
-              className="text-convrt-dark-blue/80 hover:text-convrt-dark-blue font-medium transition-colors"
+              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Pricing

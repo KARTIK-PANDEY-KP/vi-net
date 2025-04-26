@@ -49,10 +49,10 @@ const HowItWorks = () => {
           <div className="section-tag">
             From Ignored to Trusted
           </div>
-          <h2 className="heading-lg text-convrt-dark-blue mb-4">
-            How <span className="gradient-text">Convrt.ai</span> Works in 3 Steps
+          <h2 className="heading-lg text-project-dave-dark-blue mb-4">
+            How <span className="gradient-text">project dave</span> Works in 3 Steps
           </h2>
-          <p className="text-convrt-dark-blue/80 text-lg max-w-2xl mx-auto">
+          <p className="text-project-dave-dark-blue/80 text-lg max-w-2xl mx-auto">
             Our AI-driven platform automates social engagement for your sales and GTM teams, transforming cold outreach into warm connections.
           </p>
         </div>
