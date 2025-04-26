@@ -98,9 +98,28 @@ const Hero = ({ showCTA = true }: { showCTA?: boolean }) => {
           )}
 
           {/* Modern Platform Showcase */}
-          <motion.div ref={demoRef} variants={itemVariants}>
-            <PlatformDemo />
-          </motion.div>
+          <div className="mt-24 relative">
+            {/* Decorative background effect */}
+            <div className="absolute inset-0 -m-6 bg-gradient-to-br from-convrt-purple/20 via-convrt-purple/20 to-convrt-purple/20 rounded-3xl blur-3xl opacity-40"></div>
+            
+            {/* Device frame effect */}
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-black/5 mx-auto" style={{ maxWidth: '900px', padding: '16px' }}>
+              {/* Inner frame effect */}
+              <div className="relative z-10 rounded-2xl overflow-hidden bg-white/2 border border-white/10 shadow-inner">
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  className="w-full h-full object-cover"
+                  style={{ display: 'block', width: '100%', minHeight: '500px' }}
+                >
+                  <source src="/src/assets/demovid3.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+          </div>
 
           {/* Stats Section - Enhanced with better styling and icons */}
           {/* <StatsSection statsRef={statsRef} /> */}

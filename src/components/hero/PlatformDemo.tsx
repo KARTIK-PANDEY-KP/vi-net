@@ -5,34 +5,32 @@ const PlatformDemo: React.FC = () => {
   
   useEffect(() => {
     if (videoRef.current) {
-      // Make the video play at normal speed
+      // Make the video play much faster
       videoRef.current.playbackRate = 1;
     }
   }, []);
 
   return (
-    <div className="flex justify-center items-center w-full" style={{ marginTop: '30rem' }}>
-      {/* Tablet/Device Container */}
-      <div className="relative max-w-3xl w-full mx-auto" style={{ maxWidth: '750px' }}>
-        {/* Decorative gradient background */}
-        <div className="absolute inset-0 -m-10 bg-gradient-to-br from-convrt-purple/20 via-convrt-purple/20 to-convrt-purple/20 rounded-3xl blur-3xl opacity-40"></div>
-        
-        {/* Device frame */}
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-black flex justify-center items-center" style={{ aspectRatio: '4/3' }}>
-          {/* Video that completely fills the container */}
-          <div className="w-full h-full overflow-hidden">
-            <video 
-              ref={videoRef}
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              className="w-full h-full object-cover object-center"
-            >
-              <source src="/src/assets/demovid3.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
+    <div className="relative max-w-5xl mx-auto" style={{ marginTop: '30rem' }}> {/* Using MASSIVE margin to push way down */}
+      {/* Decorative gradient background */}
+      <div className="absolute inset-0 -m-10 bg-gradient-to-br from-convrt-purple/20 via-convrt-purple/20 to-convrt-purple/20 rounded-3xl blur-3xl opacity-40"></div>
+      
+      {/* Main video container */}
+      <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm bg-black">
+        {/* Video that completely fills the container */}
+        <div className="w-full h-full">
+          <video 
+            ref={videoRef}
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="w-full h-full object-cover object-center"
+            style={{ display: 'block', width: '110%', minHeight: '500px' }}
+          >
+            <source src="/src/assets/demovid3.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       </div>
     </div>
