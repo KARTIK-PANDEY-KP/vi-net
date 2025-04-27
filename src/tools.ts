@@ -1,14 +1,16 @@
 import { z } from "zod";
 import { ToolConfig } from "@dainprotocol/service-sdk";
 import { FormUIBuilder, CardUIBuilder, TableUIBuilder, DainResponse } from "@dainprotocol/utils";
-import { fetchLinkedInProfiles, sendGmailInvitations, searchLinkedInUsers } from "./functions";
+import { fetchLinkedInProfiles, searchLinkedInUsers } from "./functions";
+import { sendGmailInvitations } from "./gmail-service";
 
 export const scheduleCoffeeChatConfig: ToolConfig = {
   id: "schedule-coffee-chat",
   name: "Schedule Coffee Chat",
-  description: "This sends a coffee chat invitation through email when provided with a query that targets a broad range of people, such as job title or education. ONLY use this tool when the user explicitly wants to schedule a coffee chat with people that fit a certain query. Requires a meeting link, resume URL, and search criteria for finding potential chat partners. This tool will search for profiles AND send invitations.",
+  description: "This sends a coffee chat invitation through email when provided with a query that targets a broad range of people, such as job title or education. ONLY use this tool when the user explicitly wants to schedule a coffee chat with people that fit a certain query. Requires a meeting link, scheduling link, resume URL, and search criteria for finding potential chat partners. This tool will search for profiles AND send invitations.",
   input: z.object({
-    googleMeetLink: z.string().url().describe("Google Meet or Zoom link for the coffee chat"),
+    meetingLink: z.string().url().describe("Google Meet or Zoom link for the coffee chat"),
+    schedulingLink: z.string().url().describe("Calendly or other scheduling platform link"),
     resumeUrl: z.string().url().describe("URL to your resume or LinkedIn profile"),
     preferredChatPartner: z.string().describe("Specific type of professional you want to meet (e.g., 'software engineer at Google')"),
     personalMessage: z.string().optional().describe("Optional custom message to include in the invitation")
@@ -21,20 +23,20 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
       email: z.string(),
     })),
   }),
-  handler: async ({ MeetingLink, ScheduleLink, resumeUrl, preferredChatPartner }, agentInfo) => {
-    if (!MeetingLink || !ScheduleLink || !resumeUrl || !preferredChatPartner) {
+  handler: async ({ meetingLink, schedulingLink, resumeUrl, preferredChatPartner, personalMessage }, agentInfo) => {
+    if (!meetingLink || !schedulingLink || !resumeUrl || !preferredChatPartner) {
       const formUI = new FormUIBuilder()
         .title("Schedule Coffee Chat")
         .addFields([
           {
-            name: "MeetingLink",
+            name: "meetingLink",
             label: "Google Meet Link or Zoom Link",
             type: "string",
             widget: "url",
             required: true,
           },
           {
-            name: "ScheduleLink",
+            name: "schedulingLink",
             label: "Calendly Link or Scheduling Link",
             type: "string",
             widget: "url",
@@ -54,6 +56,13 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
             widget: "text",
             required: true,
           },
+          {
+            name: "personalMessage",
+            label: "Personal Message (Optional)",
+            type: "string",
+            widget: "textarea",
+            required: false,
+          },
         ])
         .onSubmit({
           tool: "schedule-coffee-chat",
@@ -70,9 +79,23 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
 
     // Fetch LinkedIn profiles
     const profiles = await fetchLinkedInProfiles(preferredChatPartner);
+    
+    if (profiles.length === 0) {
+      return new DainResponse({
+        text: "No profiles found matching your criteria",
+        data: {
+          message: "No profiles found matching your criteria",
+          invitedProfiles: []
+        },
+        ui: new CardUIBuilder()
+          .title("No Profiles Found")
+          .content(`No LinkedIn profiles were found matching your criteria: "${preferredChatPartner}"`)
+          .build(),
+      });
+    }
 
-    // Send Gmail invitations
-    await sendGmailInvitations(MeetingLink, ScheduleLink, resumeUrl, profiles);
+    // Send Gmail invitations using the proper function from gmail-service.ts
+    const emailResult = await sendGmailInvitations(agentInfo.id, meetingLink, resumeUrl, profiles);
 
     // Create a table to display invited profiles
     const profilesTable = new TableUIBuilder()
@@ -84,14 +107,35 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
       .rows(profiles)
       .build();
 
+    // Create response message based on email sending result
+    let resultMessage = "";
+    if (emailResult.success) {
+      resultMessage = `
+        Your coffee chat invitations have been sent successfully!
+        Sent: ${emailResult.sentCount}, Failed: ${emailResult.failedCount}
+      `;
+    } else if (emailResult.sentCount > 0) {
+      resultMessage = `
+        Your coffee chat invitations have been partially sent.
+        Sent: ${emailResult.sentCount}, Failed: ${emailResult.failedCount}
+      `;
+    } else {
+      resultMessage = `
+        Unable to send your coffee chat invitations.
+        Please check your Gmail connection or try again later.
+      `;
+    }
+
     const confirmationCard = new CardUIBuilder()
       .title("Coffee Chat Scheduled")
       .content(`
-        Your coffee chat has been scheduled and invitations sent!
+        ${resultMessage}
         
-        Google Meet Link: ${MeetingLink}
+        Meeting Link: ${meetingLink}
+        Scheduling Link: ${schedulingLink}
         Resume: ${resumeUrl}
         Preferred Chat Partner: ${preferredChatPartner}
+        ${personalMessage ? `Personal Message: ${personalMessage}` : ''}
       `)
       .addChild(profilesTable)
       .build();
@@ -117,7 +161,7 @@ export const linkedInSearchConfig: ToolConfig = {
   }),
   output: z.object({
     message: z.string(),
-    profiles: z.array(z.object({
+    invitedProfiles: z.array(z.object({
       name: z.string(),
       title: z.string(),
       email: z.string().optional(),
@@ -183,9 +227,9 @@ export const linkedInSearchConfig: ToolConfig = {
       text: `Found ${profiles.length} LinkedIn profiles matching "${query}"`,
       data: {
         message: `Found ${profiles.length} LinkedIn profiles matching "${query}"`,
-        profiles: profiles,
+        profiles,
       },
       ui: resultsCard,
     });
   },
-}; 
+};

@@ -85,7 +85,8 @@ async function sendGmailInvitations(
   agentId: string, 
   meetLink: string, 
   resumeUrl: string, 
-  recipients: LinkedInProfile[]
+  recipients: LinkedInProfile[],
+  schedulingLink?: string
 ): Promise<{success: boolean, sentCount: number, failedCount: number}> {
   console.log(`[GMAIL API] Sending invitations to ${recipients.length} recipients`);
   
@@ -102,6 +103,7 @@ async function sendGmailInvitations(
           <p>Hello ${recipient.name},</p>
           <p>I would like to invite you to a coffee chat to discuss potential opportunities.</p>
           <p><strong>Google Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>
+          ${schedulingLink ? `<p><strong>Scheduling Link:</strong> <a href="${schedulingLink}">Schedule a time that works for you</a></p>` : ''}
           <p>I've attached my resume for your reference: <a href="${resumeUrl}">My Resume</a></p>
           <p>Looking forward to our conversation!</p>
           <p>Best regards,</p>

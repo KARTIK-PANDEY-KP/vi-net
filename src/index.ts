@@ -76,7 +76,7 @@ const dainService = defineDAINService({
   tools: [
     sendEmailConfig,
     profileEnrichmentConfig,
-    linkedInProfileDataConfig
+    linkedInProfileDataConfig,
     linkedInSearchConfig,
     scheduleCoffeeChatConfig,
     profileEnrichmentConfig,
