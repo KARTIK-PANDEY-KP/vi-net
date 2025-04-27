@@ -259,7 +259,7 @@ export async function searchLinkedInUsers(query: string, limit: number = 10): Pr
     
     try {
       response = await api.get(requestUrl, {
-        timeout: 30000 // 30 seconds timeout
+        timeout: 50000 // 30 seconds timeout
       });
     } catch (requestError) {
       // Handle request errors
