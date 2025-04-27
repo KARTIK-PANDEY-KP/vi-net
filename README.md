@@ -5,8 +5,9 @@ This DAIN service integrates LinkedIn profile search capabilities with Gmail for
 ## Features
 
 - **LinkedIn Profile Search**: Search for professionals based on keywords, job titles, or other criteria
-- **Coffee Chat Scheduling**: Find potential networking contacts and send them meeting invitations 
-- **Gmail Email Sending**: Send custom emails using your Gmail account
+- **Profile Enrichment**: Get detailed information about LinkedIn profiles to personalize your outreach
+- **Personalized Coffee Chat Scheduling**: Find potential networking contacts and send them personalized meeting invitations 
+- **Gmail Email Sending**: Send custom emails using your Gmail account with AI-generated personalization
 
 ## Architecture
 
@@ -18,6 +19,9 @@ The service is structured modularly with separate files for each major component
 - `gmail-tool.ts` - Gmail email sending tool definition
 - `linkedin-service.ts` - LinkedIn API interaction functions
 - `linkedin-tools.ts` - LinkedIn search and coffee chat tool definitions
+- `linkedin-profile-service.ts` - Advanced LinkedIn profile enrichment functions
+- `profile-enrichment-tool.ts` - Tool for enhanced LinkedIn profile details
+- `workflow-tools.ts` - End-to-end workflow tools combining multiple capabilities
 
 ## Setup
 
@@ -43,6 +47,9 @@ OAUTH_REDIRECT_URI=your_oauth_redirect_uri
 
 # LinkedIn API
 LINKD_API_KEY=your_linkedin_api_key
+
+# Profile Enrichment API
+PROFILE_API_KEY=your_profile_api_key
 
 # Service Configuration
 TUNNEL_URL=your_public_service_url
@@ -83,16 +90,26 @@ Search for LinkedIn profiles matching specific criteria.
 - `query` - Search keywords (e.g., "software engineer at Google")
 - `limit` - Maximum number of results (default: 5)
 
-### 2. Schedule Coffee Chat
+### 2. Profile Enrichment
+
+Get detailed information about LinkedIn profiles to use for personalization.
+
+**Inputs:**
+- `query` - Search keywords to find profiles
+- `limit` - Maximum number of results (default: 3)
+
+### 3. Schedule Coffee Chat
 
 Schedule coffee chats with LinkedIn professionals and send Gmail invitations.
 
 **Inputs:**
-- `googleMeetLink` - Google Meet URL for the meeting
+- `fullName` - Your full name
+- `meetingLink` - Zoom/Google Meet URL for the meeting
+- `calendarLink` - Calendly/Notion scheduling link
 - `resumeUrl` - URL to your resume
 - `preferredChatPartner` - Type of professional you want to meet
 
-### 3. Send Email
+### 4. Send Email
 
 Send custom emails via Gmail.
 
@@ -100,6 +117,18 @@ Send custom emails via Gmail.
 - `to` - Recipient email address
 - `subject` - Email subject
 - `body` - Email body content (supports HTML)
+
+### 5. Personalized Outreach
+
+End-to-end workflow that searches for contacts, enriches their profiles, and sends personalized emails.
+
+**Inputs:**
+- `fullName` - Your full name
+- `meetingLink` - Zoom/Google Meet URL for the meeting
+- `calendarLink` - Calendly/Notion scheduling link
+- `resumeUrl` - URL to your resume
+- `searchQuery` - LinkedIn search query
+- `maxContacts` - Maximum number of contacts to reach out to
 
 ## Customization
 

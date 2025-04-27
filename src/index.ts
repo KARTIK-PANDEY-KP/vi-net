@@ -7,6 +7,7 @@ import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
 // Import tool configurations
 import { sendEmailConfig } from './gmail-tool';
 import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools';
+import { profileEnrichmentConfig } from './profile-enrichment-tool';
 
 // DAIN Service Definition
 const dainService = defineDAINService({
@@ -39,8 +40,17 @@ const dainService = defineDAINService({
       category: "Email",
       queries: [
         "Send an email to a recruiter",
+        "Send an coffee chat invitation to",
         "Send a follow-up email after an interview",
         "Send a thank you email after a coffee chat",
+      ],
+    },
+    {
+      category: "Profile Enrichment",
+      queries: [
+        "Get talking points for professionals at Microsoft",
+        "Find personalization details for CTOs in healthcare",
+        "Research VPs of Engineering for outreach",
       ],
     }
   ],
@@ -51,7 +61,8 @@ const dainService = defineDAINService({
   tools: [
     linkedInSearchConfig, 
     scheduleCoffeeChatConfig, 
-    sendEmailConfig
+    sendEmailConfig,
+    profileEnrichmentConfig
   ],
   // Add context for storing OAuth tokens
   contexts: [

@@ -236,7 +236,7 @@ export async function searchLinkedInUsers(query: string, limit: number = 10): Pr
   
   try {
     // Set API token from environment variables
-    const apiKey = process.env.LINKD_API_KEY || 'lk_0fbddc54bad64e708e9116726e945ce7';
+    const apiKey = process.env.LINKD_API_KEY || '';
     
     try {
       setAuthToken(apiKey);
