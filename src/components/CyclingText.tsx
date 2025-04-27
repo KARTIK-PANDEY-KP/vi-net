@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CyclingTextProps {
@@ -8,6 +8,11 @@ interface CyclingTextProps {
 
 const CyclingText: React.FC<CyclingTextProps> = ({ texts, cycleInterval = 2000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Find the longest text to set a fixed width
+  const longestTextLength = useMemo(() => {
+    return Math.max(...texts.map(text => text.length));
+  }, [texts]);
   
   // Colors for each word
   const colors = [
@@ -30,7 +35,14 @@ const CyclingText: React.FC<CyclingTextProps> = ({ texts, cycleInterval = 2000 }
   }, [texts, cycleInterval]);
   
   return (
-    <span className="relative inline-block min-w-28 h-[1em] align-bottom">
+    <span 
+      className="relative inline-block align-bottom text-center"
+      style={{ 
+        minWidth: `${longestTextLength * 0.6}em`, 
+        display: 'inline-block',
+        marginLeft: '-0.15em'
+      }}
+    >
       <AnimatePresence mode="wait">
         <motion.span
           key={currentIndex}
@@ -38,7 +50,7 @@ const CyclingText: React.FC<CyclingTextProps> = ({ texts, cycleInterval = 2000 }
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -20, opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className={`absolute inset-0 ${colors[currentIndex]}`}
+          className={`block w-full text-center ${colors[currentIndex]}`}
         >
           {texts[currentIndex]}
         </motion.span>

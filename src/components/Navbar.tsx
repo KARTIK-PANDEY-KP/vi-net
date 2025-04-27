@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -29,31 +30,16 @@ const Navbar = () => {
         <div className="flex items-center">
           <a href="/" className="flex items-center gap-2">
             <img 
-              src="src/assets/logo.png" 
+              src="/logo.png" 
               alt="project dave logo" 
               className="h-12 md:h-14"
             />
-            <span className="font-medium text-project-dave-dark-blue text-lg">project dave</span>
+            <span className="font-extrabold text-transparent text-2xl md:text-3xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text tracking-tight leading-tight select-none">project dave</span>
           </a>
         </div>
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/why" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2">
-            Why?
-          </Link>
-          {/* <a href="#testimonials" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors">
-            Case Studies
-          </a>
-          <a href="#product" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors">
-            Product
-          </a>
-          <a href="#pricing" className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors">
-            Pricing
-          </a> */}
-          {/* <a href="#cta" className="button-primary">
-            Get Started
-          </a> */}
           <Link to="/onboarding" className="button-primary">
             Join Waitlist
           </Link>
@@ -72,41 +58,6 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg py-4 px-6">
           <div className="flex flex-col space-y-4">
-            <Link 
-              to="/why" 
-              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors border border-black/20 rounded-md px-4 py-2 inline-block"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Why?
-            </Link>
-            {/* <a 
-              href="#testimonials" 
-              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Case Studies
-            </a>
-            <a 
-              href="#product" 
-              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Product
-            </a>
-            <a 
-              href="#pricing" 
-              className="text-project-dave-dark-blue/80 hover:text-project-dave-dark-blue font-medium transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Pricing
-            </a> */}
-            {/* <a 
-              href="#cta" 
-              className="button-primary w-full text-center"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Get Started
-            </a> */}
             <Link 
               to="/onboarding" 
               className="button-primary w-full text-center"

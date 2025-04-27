@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { 
   Calendar, 
   Check, 
@@ -8,8 +8,11 @@ import {
   Video, 
   X
 } from 'lucide-react';
+import { api } from '../services/api';
+import { useLocation } from 'react-router-dom';
 
 const OnboardingComponent = () => {
+  const location = useLocation();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -17,6 +20,8 @@ const OnboardingComponent = () => {
     additionalDetails: ''
   });
   const [isGoogleConnected, setIsGoogleConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const totalSteps = 2; // Only 2 steps: Google Connect and Resume Upload
 
@@ -37,6 +42,44 @@ const OnboardingComponent = () => {
     }
   };
 
+  const handleGoogleConnect = async () => {
+    if (!formData.fullName) {
+      setError('Please enter your full name first');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await api.login(formData.fullName);
+      // The login function will handle the redirect
+    } catch (error) {
+      console.error('Google connection error:', error);
+      setError('Failed to connect with Google. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 1. First useEffect: Set username from URL if present and force step 2
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const usernameFromUrl = params.get('username');
+    
+    if (usernameFromUrl) {
+      console.log('Username found in URL:', usernameFromUrl);
+      
+      // Set the username in state
+      setFormData(prev => ({ ...prev, fullName: usernameFromUrl }));
+      
+      // If username is in URL, assume OAuth was successful and force step 2
+      console.log('Forcing step 2 since username is in URL');
+      setIsGoogleConnected(true);
+      setStep(2);
+    }
+  }, [location.search]);
+
   const nextStep = () => {
     // Skip directly to resume upload if connected to Google
     if (isGoogleConnected && formData.fullName && step === 1) {
@@ -50,19 +93,31 @@ const OnboardingComponent = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if resume is uploaded (required)
     if (!formData.resume) {
-      alert('Please upload your resume to continue');
+      setError('Please upload your resume to continue');
       return;
     }
-    
-    // In a real app, this would submit the data to a backend
-    console.log('Form submitted:', formData);
-    // Redirect to dashboard or confirmation page
-    window.location.href = '/dashboard'; // Or use react-router navigate
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      await api.completeProfile(formData.fullName, {
+        fullName: formData.fullName,
+        additionalDetails: formData.additionalDetails
+      });
+      
+      // Redirect to coming soon page instead of dashboard
+      window.location.href = '/coming-soon';
+    } catch (err) {
+      setError('Failed to save profile. Please try again.');
+      console.error('Profile submission error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,7 +127,7 @@ const OnboardingComponent = () => {
         <div className="container mx-auto flex justify-start items-center">
           <a href="/" className="flex items-center gap-2">
             <img 
-              src="src/assets/logo.png" 
+              src="/logo.png" 
               alt="project dave logo" 
               className="h-12 md:h-14"
             />
@@ -82,6 +137,13 @@ const OnboardingComponent = () => {
       </header>
 
       <div className="flex-1 container mx-auto max-w-4xl py-12 px-6">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600">{error}</p>
+          </div>
+        )}
+
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between mb-2">
@@ -138,12 +200,7 @@ const OnboardingComponent = () => {
                 
                 {/* Connect with Google button - now goes directly to resume page */}
                 <button 
-                  onClick={() => {
-                    if (formData.fullName) {
-                      setIsGoogleConnected(true);
-                      setStep(2); // Go directly to resume page
-                    }
-                  }}
+                  onClick={handleGoogleConnect}
                   className={`flex items-center justify-center gap-3 w-full max-w-sm bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg py-3 px-4 shadow-sm transition-all duration-200 ${!formData.fullName ? 'opacity-50 pointer-events-none' : ''}`}
                 >
                   <svg viewBox="0 0 24 24" width="24" height="24" className="mr-2">
@@ -172,12 +229,6 @@ const OnboardingComponent = () => {
           )}
 
           {/* Step 2: Resume Upload (was previously Step 4) */}
-
-          {/* Step 3: Scheduling Links - COMMENTED OUT
-          Step 3 has been removed to simplify the onboarding process
-          */}
-
-          {/* Step 2: Resume Upload */}
           {step === 2 && (
             <div className="space-y-6">
               <div className="mb-8">
@@ -254,9 +305,22 @@ const OnboardingComponent = () => {
                 <button 
                   className="button-primary flex items-center"
                   onClick={handleSubmit}
+                  disabled={loading}
                 >
-                  Complete Setup
-                  <ChevronRight className="ml-2 h-5 w-5" />
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      Complete Setup
+                      <ChevronRight className="ml-2 h-5 w-5" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>

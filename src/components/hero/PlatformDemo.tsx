@@ -1,14 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+import demoVideo from "../../public/demovid5.mp4";
+import demoGif from "../../public/demovid.gif";
 
 const PlatformDemo: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  
-  useEffect(() => {
-    if (videoRef.current) {
-      // Make the video play much faster
-      videoRef.current.playbackRate = 1;
-    }
-  }, []);
 
   return (
     <div className="relative max-w-5xl mx-auto" style={{ marginTop: '30rem' }}> {/* Using MASSIVE margin to push way down */}
@@ -28,7 +23,8 @@ const PlatformDemo: React.FC = () => {
             className="w-full h-full object-cover object-center"
             style={{ display: 'block', width: '110%', minHeight: '500px' }}
           >
-            <source src="/src/assets/demovid3.mp4" type="video/mp4" />
+            <source src={demoVideo} type="video/mp4" />
+            <source src={demoGif} type="image/gif" />
             Your browser does not support the video tag.
           </video>
         </div>
