@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { defineDAINService } from "@dainprotocol/service-sdk";
+import express from "express";
 
 // Import OAuth and token context
 import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
@@ -8,6 +9,10 @@ import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
 import { sendEmailConfig } from './gmail-tool';
 import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools';
 import { profileEnrichmentConfig } from './profile-enrichment-tool';
+import { linkedInProfileDataConfig } from './linkedin-profile-data-tool';
+
+// Create express app for webhooks
+const app = express();
 import { onboardingTool, getUserDataTool, updateUserProfileTool } from './onboard';
 
 // DAIN Service Definition
@@ -53,7 +58,16 @@ const dainService = defineDAINService({
         "Find personalization details for CTOs in healthcare",
         "Research VPs of Engineering for outreach",
       ],
-    }
+    },
+    {
+      category: "Profile Data",
+      queries: [
+        "Give me the profile data for https://www.linkedin.com/in/someprofile",
+        "Get detailed information about this LinkedIn profile: https://linkedin.com/in/username",
+        "What can you tell me about https://www.linkedin.com/in/personname",
+        "Can you show me information about this LinkedIn profile:"
+      ],
+    },
   ],
   identity: {
     apiKey: process.env.DAIN_API_KEY,
@@ -61,6 +75,8 @@ const dainService = defineDAINService({
   // Add all tool configurations
   tools: [
     sendEmailConfig,
+    profileEnrichmentConfig,
+    linkedInProfileDataConfig
     linkedInSearchConfig,
     scheduleCoffeeChatConfig,
     profileEnrichmentConfig,
@@ -91,7 +107,8 @@ const dainService = defineDAINService({
   }
 });
 
-// Start the service
+// Start the DAIN service (this will use the port already assigned by the DAIN system)
 dainService.startNode().then(({ address }) => {
-  console.log("DAIN LinkedIn & Gmail Service is running at port:" + address().port);
+  const dainPort = address().port;
+  console.log(`DAIN LinkedIn & Gmail Service is running at port: ${dainPort}`);
 });

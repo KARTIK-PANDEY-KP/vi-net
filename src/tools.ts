@@ -6,11 +6,12 @@ import { fetchLinkedInProfiles, sendGmailInvitations, searchLinkedInUsers } from
 export const scheduleCoffeeChatConfig: ToolConfig = {
   id: "schedule-coffee-chat",
   name: "Schedule Coffee Chat",
-  description: "Schedule a coffee chat by providing necessary details and send invitations",
+  description: "This sends a coffee chat invitation through email when provided with a query that targets a broad range of people, such as job title or education. ONLY use this tool when the user explicitly wants to schedule a coffee chat with people that fit a certain query. Requires a meeting link, resume URL, and search criteria for finding potential chat partners. This tool will search for profiles AND send invitations.",
   input: z.object({
-    googleMeetLink: z.string().url(),
-    resumeUrl: z.string().url(),
-    preferredChatPartner: z.string(),
+    googleMeetLink: z.string().url().describe("Google Meet or Zoom link for the coffee chat"),
+    resumeUrl: z.string().url().describe("URL to your resume or LinkedIn profile"),
+    preferredChatPartner: z.string().describe("Specific type of professional you want to meet (e.g., 'software engineer at Google')"),
+    personalMessage: z.string().optional().describe("Optional custom message to include in the invitation")
   }),
   output: z.object({
     message: z.string(),
