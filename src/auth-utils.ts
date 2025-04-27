@@ -1,11 +1,26 @@
 import { OAuth2Client } from 'google-auth-library';
 import { ServiceContext, AgentInfo } from "@dainprotocol/service-sdk";
+import * as fs from 'fs';
+import * as path from 'path';
+import { db, COLLECTIONS, firestoreHelpers } from './firestore';
 
-// Create OAuth2 client
+// Load Google credentials from JSON file
+const credentialsPath = path.join(process.cwd(), 'GCP_gmail_api_credentials.json');
+let credentials: any;
+
+try {
+  const credentialsFile = fs.readFileSync(credentialsPath, 'utf8');
+  credentials = JSON.parse(credentialsFile);
+} catch (error) {
+  console.error('[AUTH] Error loading Google credentials:', error);
+  throw new Error('Failed to load Google credentials. Please ensure GCP_gmail_api_credentials.json exists in the root directory.');
+}
+
+// Create OAuth2 client with credentials from JSON
 const oauth2Client = new OAuth2Client(
-  process.env.GMAIL_CLIENT_ID,
-  process.env.GMAIL_CLIENT_SECRET,
-  process.env.OAUTH_REDIRECT_URI || 'https://your-redirect-uri.com'
+  credentials.web.client_id,
+  credentials.web.client_secret,
+  credentials.web.redirect_uris[0]
 );
 
 // Define token types
@@ -21,23 +36,17 @@ interface TokenStore {
   [key: string]: OAuthTokens;
 }
 
-// OAuth tokens context - this will store OAuth tokens in the context
-// instead of using an in-memory store
+// OAuth tokens context
 const oauthTokensContext: ServiceContext = {
   id: "oauthTokens",
   name: "OAuth Tokens",
   description: "User's OAuth tokens for various services",
   getContextData: async (agentInfo: AgentInfo) => {
-    // This function creates context data for the assistant
-    // We don't want to expose actual tokens to the assistant
-    // Just provide information about what's connected
-    
     const tokenStore = await getContextStore(agentInfo.id);
     if (!tokenStore) {
       return "No OAuth connections are currently set up for this user.";
     }
     
-    // Create a safe representation of what's connected
     const connectedServices = [];
     if (tokenStore.google) {
       const expiryDate = new Date(tokenStore.google.expiry_date);
@@ -56,30 +65,29 @@ ${connectedServices.join('\n')}
   }
 };
 
-// Context storage and retrieval functions
-// In a production app, these would use a database
-let contextStoreData: { [agentId: string]: { [contextId: string]: any } } = {};
-
-// Store data in context
+// Store data in Firestore
 async function setContextStore(agentId: string, data: TokenStore): Promise<void> {
-  if (!contextStoreData[agentId]) {
-    contextStoreData[agentId] = {};
+  try {
+    await firestoreHelpers.setDocData(COLLECTIONS.OAUTH_TOKENS, agentId, { tokens: data });
+    console.log(`[AUTH] Stored OAuth tokens for agent ${agentId} in Firestore`);
+  } catch (error) {
+    console.error(`[AUTH] Error storing tokens for agent ${agentId}:`, error);
+    throw error;
   }
-  contextStoreData[agentId].oauthTokens = data;
-  
-  // For production, this would be saved to a database
-  console.log(`[AUTH] Stored OAuth tokens for agent ${agentId}`);
 }
 
-// Get data from context
+// Get data from Firestore
 async function getContextStore(agentId: string): Promise<TokenStore | null> {
-  if (!contextStoreData[agentId] || !contextStoreData[agentId].oauthTokens) {
+  try {
+    const data = await firestoreHelpers.getDocData(COLLECTIONS.OAUTH_TOKENS, agentId);
+    return data?.tokens || null;
+  } catch (error) {
+    console.error(`[AUTH] Error retrieving tokens for agent ${agentId}:`, error);
     return null;
   }
-  return contextStoreData[agentId].oauthTokens;
 }
 
-// Store Google OAuth tokens in context
+// Store Google OAuth tokens in Firestore
 async function storeGoogleTokens(agentId: string, tokens: any): Promise<void> {
   const tokenStore = await getContextStore(agentId) || {};
   tokenStore.google = tokens;
@@ -87,7 +95,7 @@ async function storeGoogleTokens(agentId: string, tokens: any): Promise<void> {
   console.log(`[AUTH] Successfully stored Google tokens for agent ${agentId}`);
 }
 
-// Get Google OAuth tokens from context
+// Get Google OAuth tokens from Firestore
 async function getGoogleTokens(agentId: string): Promise<OAuthTokens | null> {
   const tokenStore = await getContextStore(agentId);
   if (!tokenStore || !tokenStore.google) {
@@ -104,7 +112,6 @@ async function getValidGoogleClient(agentId: string): Promise<OAuth2Client | nul
     return null;
   }
   
-  // Check if tokens are expired and need refreshing
   if (tokens.expiry_date && Date.now() > tokens.expiry_date && tokens.refresh_token) {
     try {
       console.log('[AUTH] Refreshing expired Google token');
@@ -112,7 +119,6 @@ async function getValidGoogleClient(agentId: string): Promise<OAuth2Client | nul
       const response = await oauth2Client.refreshAccessToken();
       const newTokens = response.credentials;
       
-      // Store the refreshed tokens
       await storeGoogleTokens(agentId, newTokens);
       oauth2Client.setCredentials(newTokens);
     } catch (error) {
@@ -120,7 +126,6 @@ async function getValidGoogleClient(agentId: string): Promise<OAuth2Client | nul
       return null;
     }
   } else {
-    // Set the existing tokens
     oauth2Client.setCredentials(tokens);
   }
   

@@ -8,6 +8,7 @@ import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
 import { sendEmailConfig } from './gmail-tool';
 import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools';
 import { profileEnrichmentConfig } from './profile-enrichment-tool';
+import { onboardingTool, getUserDataTool, updateUserProfileTool } from './onboard';
 
 // DAIN Service Definition
 const dainService = defineDAINService({
@@ -59,10 +60,13 @@ const dainService = defineDAINService({
   },
   // Add all tool configurations
   tools: [
-    linkedInSearchConfig, 
-    scheduleCoffeeChatConfig, 
     sendEmailConfig,
-    profileEnrichmentConfig
+    linkedInSearchConfig,
+    scheduleCoffeeChatConfig,
+    profileEnrichmentConfig,
+    onboardingTool,
+    getUserDataTool,
+    updateUserProfileTool
   ],
   // Add context for storing OAuth tokens
   contexts: [

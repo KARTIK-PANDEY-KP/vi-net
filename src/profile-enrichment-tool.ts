@@ -3,6 +3,24 @@ import { ToolConfig } from "@dainprotocol/service-sdk";
 import { FormUIBuilder, CardUIBuilder, TableUIBuilder, DainResponse } from "@dainprotocol/utils";
 import { searchLinkedInUsers, LinkedInProfile } from "./linkedin-service";
 import { getDetailedProfilesInfo, extractTalkingPoints } from "./linkedin-profile-service";
+import { enforceOnboarding } from "./utils";
+
+// Define output schema
+const profileEnrichmentOutputSchema = z.object({
+  profiles: z.array(z.object({
+    name: z.string(),
+    title: z.string(),
+    email: z.string(),
+    profileUrl: z.string().optional(),
+    profilePicture: z.string().optional(),
+    talkingPoints: z.array(z.string()).optional(),
+    industry: z.string().optional(),
+    company: z.string().optional(),
+    location: z.string().optional(),
+    skills: z.array(z.string()).optional(),
+    interests: z.array(z.string()).optional(),
+  })),
+});
 
 // LinkedIn Profile Enrichment Tool
 export const profileEnrichmentConfig: ToolConfig = {
@@ -13,22 +31,8 @@ export const profileEnrichmentConfig: ToolConfig = {
     query: z.string(),
     limit: z.number().optional().default(3),
   }),
-  output: z.object({
-    profiles: z.array(z.object({
-      name: z.string(),
-      title: z.string(),
-      email: z.string(),
-      profileUrl: z.string().optional(),
-      profilePicture: z.string().optional(),
-      talkingPoints: z.array(z.string()).optional(),
-      industry: z.string().optional(),
-      company: z.string().optional(),
-      location: z.string().optional(),
-      skills: z.array(z.string()).optional(),
-      interests: z.array(z.string()).optional(),
-    })),
-  }),
-  handler: async ({ query, limit }, agentInfo) => {
+  output: profileEnrichmentOutputSchema,
+  handler: enforceOnboarding(async ({ query, limit }, agentInfo) => {
     if (!query) {
       const formUI = new FormUIBuilder()
         .title("LinkedIn Profile Enrichment")
@@ -63,84 +67,65 @@ export const profileEnrichmentConfig: ToolConfig = {
     }
 
     try {
-      console.log(`[PROFILE ENRICHMENT] Starting search for query: "${query}" with limit: ${limit}`);
-      
-      // Step 1: Search for LinkedIn profiles
       const profiles = await searchLinkedInUsers(query, limit);
+      const enrichedProfiles = await getDetailedProfilesInfo(profiles);
       
-      if (profiles.length === 0) {
-        return new DainResponse({
-          text: "No profiles found matching your search criteria",
-          data: { profiles: [] },
-          ui: new CardUIBuilder()
-            .title("No Results")
-            .content(`No LinkedIn profiles were found matching your search for "${query}"`)
-            .build(),
-        });
-      }
-      
-      // Step 2: Get detailed profile information
-      const profileDetails = await getDetailedProfilesInfo(profiles);
-      
-      // Step 3: Enrich profiles with detailed information
-      const enrichedProfiles = profiles.map(profile => {
-        const details = profileDetails[profile.email];
-        
-        // Create enriched profile
-        const enriched = {
-          ...profile,
-          industry: details?.industry,
-          company: details?.company,
-          location: details?.location,
-          skills: details?.skills,
-          interests: details?.interests,
-          talkingPoints: [] as string[], // Initialize talkingPoints
-        };
-        
-        // Extract talking points if details available
-        if (details) {
-          enriched.talkingPoints = extractTalkingPoints(details);
-        } else {
-          enriched.talkingPoints = [
-            `Experience as ${profile.title}`,
-            `Professional background`
-          ];
-        }
-        
-        return enriched;
-      });
-      
-      // Create table to display enriched profiles
-      const talkingPointsColumns = [
-        { key: "profilePicture", header: "Picture", type: "image" },
-        { key: "name", header: "Name", type: "string" },
-        { key: "title", header: "Title", type: "string" },
-        { key: "company", header: "Company", type: "string" },
-        { key: "talkingPoints", header: "Talking Points", type: "list" }
-      ];
-      
+      // Create a table to display results
       const profilesTable = new TableUIBuilder()
-        .addColumns(talkingPointsColumns)
-        .rows(enrichedProfiles)
+        .addColumns([
+          { key: "name", header: "Name", type: "string" },
+          { key: "title", header: "Title", type: "string" },
+          { key: "email", header: "Email", type: "string" },
+          { key: "company", header: "Company", type: "string" },
+          { key: "location", header: "Location", type: "string" }
+        ])
+        .rows(profiles)
         .build();
         
-      // Create response
+      // Create detailed cards for each profile
+      const profileCards = profiles.map(profile => {
+        const details = enrichedProfiles[profile.email];
+        const talkingPoints = details ? extractTalkingPoints(details) : [];
+        
+        return new CardUIBuilder()
+          .title(profile.name)
+          .content(`
+            <h3>${profile.title}</h3>
+            <p><strong>Company:</strong> ${details?.company || 'N/A'}</p>
+            <p><strong>Location:</strong> ${details?.location || 'N/A'}</p>
+            <p><strong>Industry:</strong> ${details?.industry || 'N/A'}</p>
+            <h4>Skills:</h4>
+            <ul>
+              ${(details?.skills || []).map(skill => `<li>${skill}</li>`).join('')}
+            </ul>
+            <h4>Interests:</h4>
+            <ul>
+              ${(details?.interests || []).map(interest => `<li>${interest}</li>`).join('')}
+            </ul>
+            <h4>Talking Points:</h4>
+            <ul>
+              ${talkingPoints.map(point => `<li>${point}</li>`).join('')}
+            </ul>
+          `)
+          .build();
+      });
+
       const resultsCard = new CardUIBuilder()
         .title(`Enriched LinkedIn Profiles: ${query}`)
-        .content(`
-          Found ${enrichedProfiles.length} profiles matching your search for "${query}".
-          Each profile includes personalized talking points that can be used in your outreach messages.
-        `)
+        .content(`Found and enriched ${profiles.length} profiles matching your search for "${query}"`)
         .addChild(profilesTable)
+        .addChild(new CardUIBuilder().addChild(profileCards[0]).build())
         .build();
-        
+
       return new DainResponse({
-        text: `Found and enriched ${enrichedProfiles.length} LinkedIn profiles for "${query}"`,
-        data: { profiles: enrichedProfiles },
-        ui: resultsCard
+        text: `Found and enriched ${profiles.length} LinkedIn profiles matching "${query}"`,
+        data: {
+          profiles: profiles,
+        },
+        ui: resultsCard,
       });
     } catch (error) {
-      console.error(`[PROFILE ENRICHMENT] Error in profile enrichment:`, error);
+      console.error(`[PROFILE ENRICHMENT] Error enriching profiles: ${error.message}`);
       
       const errorCard = new CardUIBuilder()
         .title("Profile Enrichment Error")
@@ -152,12 +137,14 @@ export const profileEnrichmentConfig: ToolConfig = {
           Please check your API configuration or try a different search query.
         `)
         .build();
-        
+      
       return new DainResponse({
         text: `Error enriching LinkedIn profiles: ${error.message}`,
-        data: { profiles: [] },
-        ui: errorCard
+        data: {
+          profiles: [],
+        },
+        ui: errorCard,
       });
     }
-  }
+  }, profileEnrichmentOutputSchema)
 };
