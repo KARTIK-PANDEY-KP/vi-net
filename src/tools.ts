@@ -7,7 +7,7 @@ import { sendGmailInvitations } from "./gmail-service";
 export const scheduleCoffeeChatConfig: ToolConfig = {
   id: "schedule-coffee-chat",
   name: "Schedule Coffee Chat",
-  description: "This sends a coffee chat invitation through email when provided with a query that targets a broad range of people, such as job title or education. ONLY use this tool when the user explicitly wants to schedule a coffee chat with people that fit a certain query. Requires a meeting link, scheduling link, resume URL, and search criteria for finding potential chat partners. This tool will search for profiles AND send invitations.",
+  description: "This sends a coffee chat invitation through email when provided with a query that targets a broad range of people, such as job title or education. ONLY use this tool when the user explicitly wants to schedule a coffee chat with people that fit a certain query. Requires a meeting link, scheduling link, resume URL, and search criteria for finding potential chat partners. This tool will search for profiles AND send invitations. For the email body, call the profile enrichment tool to fetch the target emails information, and generate a tailored coffee chat email based on the data from that tool.",
   input: z.object({
     meetingLink: z.string().url().describe("Google Meet or Zoom link for the coffee chat"),
     schedulingLink: z.string().url().describe("Calendly or other scheduling platform link"),

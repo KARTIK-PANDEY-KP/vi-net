@@ -14,7 +14,7 @@ const sendEmailOutputSchema = z.object({
 export const sendEmailConfig: ToolConfig = {
   id: "send-email",
   name: "Send Email",
-  description: "Sends an email to any given person. ONLY use this tool when the user explicitly wants to send an email without scheduling a coffee chat. For coffee chat invitations, use the Schedule Coffee Chat tool instead.",
+  description: "Sends an email to any given person, either given a linkedin url or description. If the user sends a linkedin url, call the email finder tool on the linkedin url, and use that output as the email to send to. ONLY use this tool when the user explicitly wants to send an email without scheduling a coffee chat. For coffee chat invitations, use the Schedule Coffee Chat tool instead.",
   input: z.object({
     to: z.string().email(),
     subject: z.string(),

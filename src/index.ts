@@ -11,6 +11,7 @@ import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools
 import { profileEnrichmentConfig } from './profile-enrichment-tool';
 import { linkedInProfileDataConfig } from './linkedin-profile-data-tool';
 import { getContactVisualizationTool } from './data-tools';
+import { emailFinderConfig } from './email-finder-tool';
 
 // Create express app for webhooks
 const app = express();
@@ -60,6 +61,14 @@ const dainService = defineDAINService({
       ],
     },
     {
+      category: "Email Finder",
+      queries: [
+        "Find email address for this LinkedIn profile: https://linkedin.com/in/username",
+        "What's the email for https://www.linkedin.com/in/john-doe",
+        "Get email from LinkedIn URL",
+      ],
+    },
+    {
       category: "Profile Data",
       queries: [
         "Give me the profile data for https://www.linkedin.com/in/someprofile",
@@ -83,7 +92,8 @@ const dainService = defineDAINService({
     onboardingTool,
     getUserDataTool,
     updateUserProfileTool,
-    getContactVisualizationTool
+    getContactVisualizationTool,
+    emailFinderConfig
   ],
   // Add context for storing OAuth tokens
   contexts: [
