@@ -1,18 +1,34 @@
+import { z } from "zod";
 import { defineDAINService } from "@dainprotocol/service-sdk";
-import { scheduleCoffeeChatConfig, linkedInSearchConfig } from "./tools";
 
+// Import OAuth and token context
+import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
+
+// Import tool configurations
+import { sendEmailConfig } from './gmail-tool';
+import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools';
+
+// DAIN Service Definition
 const dainService = defineDAINService({
   metadata: {
-    title: "LinkedIn Tools",
-    description: "A service to search LinkedIn profiles and schedule coffee chats",
+    title: "LinkedIn & Gmail Tools",
+    description: "A service to search LinkedIn profiles, schedule coffee chats, and send emails via Gmail",
     version: "1.0.0",
     author: "Your Name",
-    tags: ["LinkedIn", "Schedule", "Coffee Chat", "Sales", "Email", "dain"],
+    tags: ["LinkedIn", "Gmail", "Schedule", "Coffee Chat", "Sales", "Email", "dain"],
     logo: "https://cdn-icons-png.flaticon.com/512/174/174857.png",
   },
   exampleQueries: [
     {
-      category: "Schedule",
+      category: "LinkedIn",
+      queries: [
+        "Find people who are in the software engineering field",
+        "Find product managers in San Francisco",
+        "Find data scientists at Google",
+      ],
+    },
+    {
+      category: "Coffee Chat",
       queries: [
         "Schedule a coffee chat with a software engineer",
         "Schedule a coffee chat with a product manager",
@@ -20,20 +36,47 @@ const dainService = defineDAINService({
       ],
     },
     {
-      category: "Search",
+      category: "Email",
       queries: [
-        "Find people who are in the software engineering field",
-        "Find product managers in San Francisco",
-        "Find data scientists at Google",
+        "Send an email to a recruiter",
+        "Send a follow-up email after an interview",
+        "Send a thank you email after a coffee chat",
       ],
     }
   ],
   identity: {
     apiKey: process.env.DAIN_API_KEY,
   },
-  tools: [scheduleCoffeeChatConfig, linkedInSearchConfig],
+  // Add all tool configurations
+  tools: [
+    linkedInSearchConfig, 
+    scheduleCoffeeChatConfig, 
+    sendEmailConfig
+  ],
+  // Add context for storing OAuth tokens
+  contexts: [
+    oauthTokensContext
+  ],
+  // Configure OAuth for Gmail
+  oauth2: {
+    baseUrl: process.env.TUNNEL_URL || 'http://localhost:3000',
+    providers: {
+      google: {
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth",
+        tokenUrl: "https://oauth2.googleapis.com/token",
+        scopes: ["https://www.googleapis.com/auth/gmail.send"],
+        onSuccess: async (agentId, tokens) => {
+          // Store tokens in the context
+          await storeGoogleTokens(agentId, tokens);
+        }
+      }
+    }
+  }
 });
 
+// Start the service
 dainService.startNode().then(({ address }) => {
-  console.log("DAIN Service is running at :" + address().port);
+  console.log("DAIN LinkedIn & Gmail Service is running at port:" + address().port);
 });

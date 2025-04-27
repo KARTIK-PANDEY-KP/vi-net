@@ -20,14 +20,21 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
       email: z.string(),
     })),
   }),
-  handler: async ({ googleMeetLink, resumeUrl, preferredChatPartner }, agentInfo) => {
-    if (!googleMeetLink || !resumeUrl || !preferredChatPartner) {
+  handler: async ({ MeetingLink, ScheduleLink, resumeUrl, preferredChatPartner }, agentInfo) => {
+    if (!MeetingLink || !ScheduleLink || !resumeUrl || !preferredChatPartner) {
       const formUI = new FormUIBuilder()
         .title("Schedule Coffee Chat")
         .addFields([
           {
-            name: "googleMeetLink",
-            label: "Google Meet Link",
+            name: "MeetingLink",
+            label: "Google Meet Link or Zoom Link",
+            type: "string",
+            widget: "url",
+            required: true,
+          },
+          {
+            name: "ScheduleLink",
+            label: "Calendly Link or Scheduling Link",
             type: "string",
             widget: "url",
             required: true,
@@ -64,7 +71,7 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
     const profiles = await fetchLinkedInProfiles(preferredChatPartner);
 
     // Send Gmail invitations
-    await sendGmailInvitations(googleMeetLink, resumeUrl, profiles);
+    await sendGmailInvitations(MeetingLink, ScheduleLink, resumeUrl, profiles);
 
     // Create a table to display invited profiles
     const profilesTable = new TableUIBuilder()
@@ -81,7 +88,7 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
       .content(`
         Your coffee chat has been scheduled and invitations sent!
         
-        Google Meet Link: ${googleMeetLink}
+        Google Meet Link: ${MeetingLink}
         Resume: ${resumeUrl}
         Preferred Chat Partner: ${preferredChatPartner}
       `)

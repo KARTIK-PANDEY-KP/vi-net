@@ -1,20 +1,20 @@
 import axios from 'axios';
 
 // LinkedIn API Types
-interface SearchParams {
+export interface SearchParams {
   query: string;
   limit?: number;
   school?: string[];
 }
 
-interface SearchResponse {
-  results: LinkedInProfile[];
+export interface SearchResponse {
+  results: LinkedInProfileData[];
   total: number;
   query: string;
   error?: string;
 }
 
-interface LinkedInProfileData {
+export interface LinkedInProfileData {
   profile: {
     id: string;
     name: string;
@@ -45,7 +45,7 @@ interface LinkedInProfileData {
   }>;
 }
 
-interface LinkedInProfile {
+export interface LinkedInProfile {
   name: string;
   title: string;
   email: string;
@@ -326,11 +326,3 @@ export async function fetchLinkedInProfiles(preferredChatPartner: string): Promi
   // Just use the searchLinkedInUsers function with a limit of 3
   return searchLinkedInUsers(preferredChatPartner, 3);
 }
-
-// Simulated function to send emails via Gmail
-export async function sendGmailInvitations(meetLink: string, scheduleLink: string, resumeUrl: string, recipients: any[]): Promise<void> {
-  // In a real scenario, this would use the Gmail API to send emails
-  console.log(`Sending invitations to ${recipients.length} recipients`);
-  console.log(`Meet Link: ${meetLink}`);
-  console.log(`Resume URL: ${resumeUrl}`);
-} 
