@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { ToolConfig } from "@dainprotocol/service-sdk";
-import { FormUIBuilder, CardUIBuilder, TableUIBuilder, DainResponse } from "@dainprotocol/utils";
+import {
+  FormUIBuilder,
+  CardUIBuilder,
+  TableUIBuilder,
+  DainResponse,
+} from "@dainprotocol/utils";
 import { searchLinkedInUsers, LinkedInProfile } from "./linkedin-service";
 import { getDetailedProfilesInfo } from "./linkedin-profile-service";
 import { sendGmailInvitations } from "./gmail-service";
@@ -9,7 +14,8 @@ import { sendGmailInvitations } from "./gmail-service";
 export const personalizedOutreachConfig: ToolConfig = {
   id: "personalized-outreach",
   name: "Personalized LinkedIn Outreach",
-  description: "Search for contacts, enrich their profiles, and send personalized emails in a single workflow",
+  description:
+    "This automatically searches for contacts, enriches their profiles and does a deep search on a person, and send personalized emails in a single workflow. Use this ONLY if the user asks to automatically send out coffee chat invitations to a list of people based on a search query.",
   input: z.object({
     fullName: z.string(),
     meetingLink: z.string().url(),
@@ -22,15 +28,33 @@ export const personalizedOutreachConfig: ToolConfig = {
     message: z.string(),
     sentCount: z.number(),
     failedCount: z.number(),
-    profiles: z.array(z.object({
-      name: z.string(),
-      title: z.string(),
-      email: z.string(),
-      talkingPoints: z.array(z.string()).optional(),
-    })),
+    profiles: z.array(
+      z.object({
+        name: z.string(),
+        title: z.string(),
+        email: z.string(),
+        talkingPoints: z.array(z.string()).optional(),
+      })
+    ),
   }),
-  handler: async ({ fullName, meetingLink, calendarLink, resumeUrl, searchQuery, maxContacts }, agentInfo) => {
-    if (!fullName || !meetingLink || !calendarLink || !resumeUrl || !searchQuery) {
+  handler: async (
+    {
+      fullName,
+      meetingLink,
+      calendarLink,
+      resumeUrl,
+      searchQuery,
+      maxContacts,
+    },
+    agentInfo
+  ) => {
+    if (
+      !fullName ||
+      !meetingLink ||
+      !calendarLink ||
+      !resumeUrl ||
+      !searchQuery
+    ) {
       const formUI = new FormUIBuilder()
         .title("Personalized LinkedIn Outreach")
         .addFields([
@@ -93,9 +117,11 @@ export const personalizedOutreachConfig: ToolConfig = {
 
     try {
       // Step 1: Search for LinkedIn profiles
-      console.log(`[OUTREACH] Starting search for query: "${searchQuery}" with limit: ${maxContacts}`);
+      console.log(
+        `[OUTREACH] Starting search for query: "${searchQuery}" with limit: ${maxContacts}`
+      );
       const profiles = await searchLinkedInUsers(searchQuery, maxContacts);
-      
+
       if (profiles.length === 0) {
         return new DainResponse({
           text: "No profiles found matching your search criteria",
@@ -103,50 +129,71 @@ export const personalizedOutreachConfig: ToolConfig = {
             message: "No profiles found",
             sentCount: 0,
             failedCount: 0,
-            profiles: []
+            profiles: [],
           },
           ui: new CardUIBuilder()
             .title("No Profiles Found")
-            .content(`No LinkedIn profiles were found matching your search for "${searchQuery}"`)
+            .content(
+              `No LinkedIn profiles were found matching your search for "${searchQuery}"`
+            )
             .build(),
         });
       }
-      
+
       // Step 2: Get detailed profile information
-      console.log(`[OUTREACH] Enriching ${profiles.length} profiles with detailed information`);
+      console.log(
+        `[OUTREACH] Enriching ${profiles.length} profiles with detailed information`
+      );
       const profileDetails = await getDetailedProfilesInfo(profiles);
-      
+
       // Step 3: Send personalized emails
-      console.log(`[OUTREACH] Sending personalized emails to ${profiles.length} contacts`);
-      const emailResult = await sendGmailInvitations(agentInfo.id, meetingLink, resumeUrl, profiles);
-      
+      console.log(
+        `[OUTREACH] Sending personalized emails to ${profiles.length} contacts`
+      );
+      const emailResult = await sendGmailInvitations(
+        agentInfo.id,
+        meetingLink,
+        resumeUrl,
+        profiles
+      );
+
       // Step 4: Prepare result report
-      const enrichedProfiles = profiles.map(profile => {
+      const enrichedProfiles = profiles.map((profile) => {
         const details = profileDetails[profile.email];
-        const talkingPoints = details ? [
-          details.industry ? `Industry: ${details.industry}` : null,
-          details.company ? `Company: ${details.company}` : null,
-          details.skills?.length > 0 ? `Skills: ${details.skills.slice(0, 3).join(', ')}` : null,
-          details.interests?.length > 0 ? `Interests: ${details.interests.slice(0, 3).join(', ')}` : null
-        ].filter(Boolean) : [`Role: ${profile.title}`];
-        
+        const talkingPoints = details
+          ? [
+              details.industry ? `Industry: ${details.industry}` : null,
+              details.company ? `Company: ${details.company}` : null,
+              details.skills?.length > 0
+                ? `Skills: ${details.skills.slice(0, 3).join(", ")}`
+                : null,
+              details.interests?.length > 0
+                ? `Interests: ${details.interests.slice(0, 3).join(", ")}`
+                : null,
+            ].filter(Boolean)
+          : [`Role: ${profile.title}`];
+
         return {
           ...profile,
-          talkingPoints
+          talkingPoints,
         };
       });
-      
+
       // Create a table to display results
       const resultsTable = new TableUIBuilder()
         .addColumns([
           { key: "name", header: "Name", type: "string" },
           { key: "title", header: "Title", type: "string" },
           { key: "email", header: "Email", type: "string" },
-          { key: "talkingPoints", header: "Personalization Used", type: "list" }
+          {
+            key: "talkingPoints",
+            header: "Personalization Used",
+            type: "list",
+          },
         ])
         .rows(enrichedProfiles)
         .build();
-      
+
       // Create response message based on email sending result
       let resultMessage = "";
       if (emailResult.success) {
@@ -165,10 +212,11 @@ export const personalizedOutreachConfig: ToolConfig = {
           Please check your Gmail connection or try again later.
         `;
       }
-      
+
       const confirmationCard = new CardUIBuilder()
         .title("Personalized Outreach Complete")
-        .content(`
+        .content(
+          `
           ${resultMessage}
           
           Search Query: ${searchQuery}
@@ -176,44 +224,47 @@ export const personalizedOutreachConfig: ToolConfig = {
           Meeting Link: ${meetingLink}
           Calendar: ${calendarLink}
           Resume: ${resumeUrl}
-        `)
+        `
+        )
         .addChild(resultsTable)
         .build();
-      
+
       return new DainResponse({
         text: `Personalized outreach complete. Sent: ${emailResult.sentCount}, Failed: ${emailResult.failedCount}`,
         data: {
           message: `Personalized outreach complete. Sent: ${emailResult.sentCount}, Failed: ${emailResult.failedCount}`,
           sentCount: emailResult.sentCount,
           failedCount: emailResult.failedCount,
-          profiles: enrichedProfiles
+          profiles: enrichedProfiles,
         },
         ui: confirmationCard,
       });
     } catch (error) {
       console.error(`[OUTREACH] Error in personalized outreach:`, error);
-      
+
       const errorCard = new CardUIBuilder()
         .title("Outreach Error")
-        .content(`
+        .content(
+          `
           An error occurred during the personalized outreach process:
           
           ${error.message}
           
           Please check your configuration or try again later.
-        `)
+        `
+        )
         .build();
-      
+
       return new DainResponse({
         text: `Error during personalized outreach: ${error.message}`,
         data: {
           message: `Error: ${error.message}`,
           sentCount: 0,
           failedCount: 0,
-          profiles: []
+          profiles: [],
         },
-        ui: errorCard
+        ui: errorCard,
       });
     }
-  }
+  },
 };
