@@ -81,7 +81,7 @@ export const linkedInSearchConfig: ToolConfig = {
       process.stdout.write(`[LINKD SEARCH TOOL] Starting search for query: "${query}" with limit: ${limit}\n`);
       
       // Search LinkedIn profiles
-      const profiles = await searchLinkedInUsers(query, limit);
+      const profiles = await searchLinkedInUsers(query, agentInfo.id, limit);
       console.log(`[LINKD SEARCH TOOL] Search completed successfully with ${profiles.length} results`);
       
       // Create a table to display profiles
@@ -100,7 +100,7 @@ export const linkedInSearchConfig: ToolConfig = {
         .content(`Found ${profiles.length} profiles matching your search for "${query}"`)
         .addChild(profilesTable)
         .build();
-
+      
       return new DainResponse({
         text: `Found ${profiles.length} LinkedIn profiles matching "${query}"`,
         data: {
@@ -189,7 +189,7 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
 
     try {
       // Fetch LinkedIn profiles
-      const profiles = await fetchLinkedInProfiles(preferredChatPartner);
+      const profiles = await fetchLinkedInProfiles(preferredChatPartner, agentInfo.id);
       
       if (profiles.length === 0) {
         return new DainResponse({

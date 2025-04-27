@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { updateOrCreateContact } from './firestore';
 
 // LinkedIn API Types
 export interface SearchParams {
@@ -227,11 +228,15 @@ function processApiError(error: any): string {
 }
 
 // Function to search LinkedIn profiles
-export async function searchLinkedInUsers(query: string, limit: number = 10): Promise<LinkedInProfile[]> {
+export async function searchLinkedInUsers(query: string, userId: string, limit: number = 10): Promise<LinkedInProfile[]> {
   console.log(`[LINKD API] Starting LinkedIn search for query: "${query}" with limit: ${limit}`);
   
   if (!query || query.trim() === '') {
     throw new Error('Search query cannot be empty');
+  }
+
+  if (!userId) {
+    throw new Error('User ID is required');
   }
   
   try {
@@ -288,11 +293,52 @@ export async function searchLinkedInUsers(query: string, limit: number = 10): Pr
     }
     
     // Process and sanitize each profile
-    const processedProfiles = results.map(profileData => {
+    const processedProfiles = await Promise.all(results.map(async profileData => {
       try {
-        return sanitizeProfileData(profileData);
+        console.log('[LINKD API] Starting to process profile:', JSON.stringify({
+          hasProfile: !!profileData.profile,
+          profileKeys: profileData.profile ? Object.keys(profileData.profile) : [],
+          experienceCount: (profileData.experience || []).length,
+          educationCount: (profileData.education || []).length
+        }));
+
+        const sanitizedProfile = sanitizeProfileData(profileData);
+        console.log('[LINKD API] Sanitized profile:', JSON.stringify({
+          name: sanitizedProfile.name,
+          email: sanitizedProfile.email,
+          title: sanitizedProfile.title,
+          hasProfileUrl: !!sanitizedProfile.profileUrl,
+          hasProfilePicture: !!sanitizedProfile.profilePicture
+        }));
+        
+        // Format the profile data for updateOrCreateContact
+        const contactData = {
+          name: sanitizedProfile.name,
+          email: sanitizedProfile.email,
+          additionalData: {
+            title: sanitizedProfile.title,
+            profileUrl: sanitizedProfile.profileUrl,
+            profilePicture: sanitizedProfile.profilePicture,
+            experience: profileData.experience || [],
+            education: profileData.education || []
+          }
+        };
+
+        console.log('[LINKD API] Formatted contact data:', JSON.stringify({
+          name: contactData.name,
+          email: contactData.email,
+          additionalDataKeys: Object.keys(contactData.additionalData)
+        }));
+
+        // Update or create contact in the database
+        console.log('[LINKD API] Calling updateOrCreateContact with userId:', userId);
+        await updateOrCreateContact(userId, contactData, false);
+        console.log('[LINKD API] Successfully updated/created contact');
+
+        return sanitizedProfile;
       } catch (error) {
         console.error(`[LINKD API] Error processing profile: ${error.message}`);
+        console.error('[LINKD API] Error stack:', error.stack);
         console.error('[LINKD API] Profile structure:', JSON.stringify({
           hasProfile: !!profileData.profile,
           profileKeys: profileData.profile ? Object.keys(profileData.profile) : [],
@@ -309,7 +355,7 @@ export async function searchLinkedInUsers(query: string, limit: number = 10): Pr
           profilePicture: 'https://cdn-icons-png.flaticon.com/512/174/174857.png'
         };
       }
-    });
+    }));
     
     console.log('[LINKD API] Successfully processed all profiles');
     return processedProfiles;
@@ -322,7 +368,7 @@ export async function searchLinkedInUsers(query: string, limit: number = 10): Pr
 }
 
 // Function to search for coffee chat partners
-export async function fetchLinkedInProfiles(preferredChatPartner: string): Promise<LinkedInProfile[]> {
+export async function fetchLinkedInProfiles(preferredChatPartner: string, userId: string): Promise<LinkedInProfile[]> {
   // Just use the searchLinkedInUsers function with a limit of 3
-  return searchLinkedInUsers(preferredChatPartner, 3);
+  return searchLinkedInUsers(preferredChatPartner, userId, 3);
 }

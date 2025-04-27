@@ -10,6 +10,7 @@ import { sendEmailConfig } from './gmail-tool';
 import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools';
 import { profileEnrichmentConfig } from './profile-enrichment-tool';
 import { linkedInProfileDataConfig } from './linkedin-profile-data-tool';
+import { getContactVisualizationTool } from './data-tools';
 
 // Create express app for webhooks
 const app = express();
@@ -18,12 +19,11 @@ import { onboardingTool, getUserDataTool, updateUserProfileTool } from './onboar
 // DAIN Service Definition
 const dainService = defineDAINService({
   metadata: {
-    title: "LinkedIn & Gmail Tools",
-    description: "A service to search LinkedIn profiles, schedule coffee chats, and send emails via Gmail",
+    title: "VI Network Service",
+    description: "Provides tools for managing and visualizing professional networks",
     version: "1.0.0",
-    author: "Your Name",
-    tags: ["LinkedIn", "Gmail", "Schedule", "Coffee Chat", "Sales", "Email", "dain"],
-    logo: "https://cdn-icons-png.flaticon.com/512/174/174857.png",
+    author: "VI Network",
+    tags: ["networking", "contacts", "visualization"]
   },
   exampleQueries: [
     {
@@ -76,13 +76,14 @@ const dainService = defineDAINService({
   tools: [
     sendEmailConfig,
     profileEnrichmentConfig,
-    linkedInProfileDataConfig
+    linkedInProfileDataConfig,
     linkedInSearchConfig,
     scheduleCoffeeChatConfig,
     profileEnrichmentConfig,
     onboardingTool,
     getUserDataTool,
-    updateUserProfileTool
+    updateUserProfileTool,
+    getContactVisualizationTool
   ],
   // Add context for storing OAuth tokens
   contexts: [

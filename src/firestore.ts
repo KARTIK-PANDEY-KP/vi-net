@@ -257,94 +257,137 @@ const updateContactScores = async (userId: string, contact: Contact): Promise<Co
 };
 
 // Function to update or create contact
-export const updateOrCreateContact = async (userId: string, contactData: any, interact: boolean = false): Promise<Contact> => {
-  const now = Timestamp.now();
-  
-  // Get user data
+export async function updateOrCreateContact(userId: string, contactData: { name: string; email: string | null; additionalData: any }, interact: boolean = false): Promise<void> {
+  console.log('[FIRESTORE] Starting updateOrCreateContact with:', JSON.stringify({
+    userId,
+    contactName: contactData.name,
+    hasEmail: !!contactData.email,
+    additionalDataKeys: Object.keys(contactData.additionalData),
+    interact
+  }));
+
+  try {
+    // Get user document
+    const userDoc = await db.collection('users').doc(userId).get();
+    console.log('[FIRESTORE] Retrieved user document:', userDoc.exists);
+
+    if (!userDoc.exists) {
+      console.error('[FIRESTORE] User document does not exist');
+      throw new Error('User not found');
+    }
+
+    // Get contacts array
+    const userData = userDoc.data() as UserData;
+    console.log('[FIRESTORE] User data retrieved:', JSON.stringify({
+      hasContacts: !!userData.contacts,
+      contactsCount: userData.contacts?.length || 0
+    }));
+
+    // Initialize contacts array if it doesn't exist
+    if (!userData.contacts) {
+      console.log('[FIRESTORE] Initializing contacts array');
+      userData.contacts = [];
+    }
+
+    // Find existing contact by email or name
+    let existingContactIndex = -1;
+    if (contactData.email) {
+      existingContactIndex = userData.contacts.findIndex(c => c.email === contactData.email);
+      console.log('[FIRESTORE] Search by email result:', existingContactIndex);
+    }
+    
+    if (existingContactIndex === -1) {
+      existingContactIndex = userData.contacts.findIndex(c => c.name === contactData.name);
+      console.log('[FIRESTORE] Search by name result:', existingContactIndex);
+    }
+
+    // Create or update contact
+    const now = Timestamp.now();
+    const contact: Contact = {
+      contactId: contactData.name.toLowerCase().replace(/\s+/g, '-'),
+      name: contactData.name,
+      email: contactData.email,
+      responseScore: 0,
+      similarityScore: 0,
+      lastContact: interact ? now : null,
+      contactHistory: interact ? [{
+        timestamp: now,
+        notes: 'Initial contact'
+      }] : [],
+      additionalData: contactData.additionalData
+    };
+
+    console.log('[FIRESTORE] Prepared contact object:', JSON.stringify({
+      name: contact.name,
+      hasEmail: !!contact.email,
+      hasLastContact: !!contact.lastContact,
+      historyLength: contact.contactHistory.length,
+      additionalDataKeys: Object.keys(contact.additionalData)
+    }));
+
+    if (existingContactIndex === -1) {
+      console.log('[FIRESTORE] Creating new contact');
+      userData.contacts.push(contact);
+    } else {
+      console.log('[FIRESTORE] Updating existing contact at index:', existingContactIndex);
+      const existingContact = userData.contacts[existingContactIndex];
+      
+      // Update fields
+      existingContact.name = contact.name;
+      existingContact.email = contact.email;
+      existingContact.additionalData = {
+        ...existingContact.additionalData,
+        ...contact.additionalData
+      };
+      
+      if (interact) {
+        existingContact.lastContact = now;
+        existingContact.contactHistory.push({
+          timestamp: now,
+          notes: 'Updated contact'
+        });
+      }
+    }
+
+    // Update user document
+    console.log('[FIRESTORE] Updating user document with contacts count:', userData.contacts.length);
+    await userDoc.ref.update({
+      contacts: userData.contacts,
+      updatedAt: now
+    });
+    console.log('[FIRESTORE] Successfully updated user document');
+
+  } catch (error) {
+    console.error('[FIRESTORE] Error in updateOrCreateContact:', error.message);
+    console.error('[FIRESTORE] Error stack:', error.stack);
+    throw error;
+  }
+}
+
+// Function to get all contacts for visualization
+export const getContactsForVisualization = async (userId: string): Promise<{
+  contacts: Array<{
+    contactId: string;
+    name: string;
+    email: string | null;
+    responseScore: number;
+    similarityScore: number;
+    additionalData: ContactAdditionalData;
+  }>;
+}> => {
   const userData = await firestoreHelpers.getUserData(userId);
   if (!userData) {
     throw new Error('User not found');
   }
 
-  // Create prompt for Gemini
-  const prompt = `Given the following contact data, parse it into a structured format that matches our database schema. 
-  If any information is missing or unclear, set that field to null. 
-  The schema should include: name, email, additionalData (as a JSON object containing any additional information about the contact like their preferences, work details, personality traits, etc.), and if interact is true, also include notes.
-  Here's the contact data: ${JSON.stringify(contactData)}
-  Please return only a JSON object with the following structure:
-  {
-    "name": string | null,
-    "email": string | null,
-    "additionalData": object | null,
-    "notes": string | null
-  }`;
-
-  // Call Gemini to parse the data
-  const geminiResponse = await callGemini(prompt);
-  let parsedData;
-  try {
-    parsedData = JSON.parse(geminiResponse);
-  } catch (error) {
-    console.error('Failed to parse Gemini response:', error);
-    throw new Error('Failed to parse contact data');
-  }
-
-  // Generate contactId from name
-  const contactId = parsedData.name ? parsedData.name.replace(/\s+/g, '').toLowerCase() : '';
-  
-  // Find existing contact
-  let existingContact = userData.contacts.find(c => 
-    c.email === parsedData.email || c.contactId === contactId
-  );
-
-  // Create new interaction only if interact is true
-  const newInteraction: ContactInteraction | null = interact ? {
-    timestamp: now,
-    notes: parsedData.notes || 'Contact updated'
-  } : null;
-
-  let updatedContact: Contact;
-
-  if (existingContact) {
-    // Update existing contact
-    updatedContact = {
-      ...existingContact,
-      name: parsedData.name || existingContact.name,
-      email: parsedData.email || existingContact.email,
-      lastContact: interact ? now : existingContact.lastContact,
-      contactHistory: interact 
-        ? [...existingContact.contactHistory, newInteraction!] 
-        : existingContact.contactHistory,
-      additionalData: parsedData.additionalData || existingContact.additionalData
-    };
-
-    // Update contacts array
-    const updatedContacts = userData.contacts.map(c => 
-      c.contactId === existingContact.contactId ? updatedContact : c
-    );
-
-    // Update user document
-    await firestoreHelpers.setUserData(userId, { contacts: updatedContacts });
-  } else {
-    // Create new contact
-    updatedContact = {
-      contactId,
-      name: parsedData.name || '',
-      email: parsedData.email || null,
-      responseScore: 0,
-      similarityScore: 0,
-      lastContact: interact ? now : null,
-      additionalData: parsedData.additionalData || {},
-      contactHistory: interact ? [newInteraction!] : []
-    };
-
-    // Add to contacts array
-    const updatedContacts = [...userData.contacts, updatedContact];
-
-    // Update user document
-    await firestoreHelpers.setUserData(userId, { contacts: updatedContacts });
-  }
-
-  // Update scores after the contact has been created/updated
-  return await updateContactScores(userId, updatedContact);
+  return {
+    contacts: userData.contacts.map(contact => ({
+      contactId: contact.contactId,
+      name: contact.name,
+      email: contact.email,
+      responseScore: contact.responseScore,
+      similarityScore: contact.similarityScore,
+      additionalData: contact.additionalData
+    }))
+  };
 }; 
