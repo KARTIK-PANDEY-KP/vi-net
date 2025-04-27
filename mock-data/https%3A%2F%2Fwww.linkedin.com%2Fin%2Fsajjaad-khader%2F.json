@@ -1,0 +1,31 @@
+{
+  "industry": "Finance",
+  "company": "Goldman Sachs",
+  "location": "San Francisco, CA",
+  "skills": [
+    "Excel",
+    "Risk Management",
+    "Financial Analysis",
+    "Investment Banking"
+  ],
+  "interests": [
+    "Cryptocurrency",
+    "FinTech"
+  ],
+  "education": [
+    "MIT"
+  ],
+  "languages": [
+    "English"
+  ],
+  "certifications": [],
+  "recommendations": 9,
+  "connectionDegree": 3,
+  "sharedConnections": 3,
+  "mutualConnections": [],
+  "articles": 2,
+  "posts": 6,
+  "profileSummary": "Goldman Sachs Finance expert specializing in Excel.",
+  "recentActivity": [],
+  "commonGroups": []
+}

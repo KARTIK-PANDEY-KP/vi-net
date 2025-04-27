@@ -2,13 +2,12 @@ import { z } from "zod";
 import { ToolConfig } from "@dainprotocol/service-sdk";
 import { FormUIBuilder, CardUIBuilder, TableUIBuilder, DainResponse } from "@dainprotocol/utils";
 import { getDetailedProfileInfo } from "./linkedin-profile-service";
-import { getStoredProfileInfo } from "./signalhire-webhook";
 
 // LinkedIn Profile Data Tool Configuration
 export const linkedInProfileDataConfig: ToolConfig = {
   id: "linkedin-profile-data",
   name: "LinkedIn Profile Data",
-  description: "Get detailed profile data for a specific LinkedIn URL",
+  description: "Takes in a LinkedIn profile URL and returns detailed information about the profile, including name, title, company, industry, location, skills, education, languages, certifications, and a summary. Use this tool IF and ONLY IF the user provides a LinkedIn URL.",
   input: z.object({
     linkedinUrl: z.string().url(),
   }),
@@ -58,14 +57,9 @@ export const linkedInProfileDataConfig: ToolConfig = {
     try {
       console.log(`[PROFILE DATA TOOL] Getting profile data for: ${linkedinUrl}`);
       
-      // First, check if we already have this profile information cached
-      let profileInfo = getStoredProfileInfo(linkedinUrl);
-      
-      // If not in cache, request it from SignalHire
-      if (!profileInfo) {
-        console.log(`[PROFILE DATA TOOL] Profile not in cache, requesting from SignalHire`);
-        profileInfo = await getDetailedProfileInfo(linkedinUrl);
-      }
+      // Request data directly from our LinkedIn profile service
+      // which now uses RapidAPI instead of SignalHire
+      const profileInfo = await getDetailedProfileInfo(linkedinUrl);
       
       if (!profileInfo) {
         return new DainResponse({
@@ -83,7 +77,7 @@ export const linkedInProfileDataConfig: ToolConfig = {
               Possible reasons:
               - The LinkedIn URL might be incorrect
               - The profile may not exist
-              - There might be an issue with the SignalHire API
+              - There might be an issue with the LinkedIn API
               
               Please check the URL and try again.
             `)
@@ -102,6 +96,12 @@ export const linkedInProfileDataConfig: ToolConfig = {
         { key: "certifications", label: "Certifications", value: profileInfo.certifications?.join(", ") || "Not available" },
       ];
       
+      // Get name and title from RapidAPI response if available
+      // Note: We're assuming these fields are available in the rapid API response
+      // and are handled in the getDetailedProfileInfo function
+      const name = profileInfo.name || "LinkedIn User";
+      const title = profileInfo.title || "Professional";
+      
       // Create a table to display profile details
       const detailsTable = new TableUIBuilder()
         .addColumns([
@@ -113,8 +113,8 @@ export const linkedInProfileDataConfig: ToolConfig = {
       
       // Format the profile data for the response
       const profileData = {
-        name: "LinkedIn User", // SignalHire provides this but we're not including it in our interface
-        title: "Professional", // SignalHire provides this but we're not including it in our interface
+        name,
+        title,
         company: profileInfo.company,
         industry: profileInfo.industry,
         location: profileInfo.location,

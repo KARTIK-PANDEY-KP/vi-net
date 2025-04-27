@@ -7,7 +7,7 @@ import { sendGmailEmail } from "./gmail-service";
 export const sendEmailConfig: ToolConfig = {
   id: "send-email",
   name: "Send Email",
-  description: "Sends an email using the user's Gmail account based on a linkedIn profile",
+  description: "Sends an email to any given person. ONLY use this tool when the user explicitly wants to send an email without scheduling a coffee chat. For coffee chat invitations, use the Schedule Coffee Chat tool instead.",
   input: z.object({
     to: z.string().email(),
     subject: z.string(),

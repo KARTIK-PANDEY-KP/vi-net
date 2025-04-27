@@ -8,10 +8,12 @@ import { sendGmailInvitations } from "./gmail-service";
 export const linkedInSearchConfig: ToolConfig = {
   id: "linkedin-search",
   name: "LinkedIn Search",
-  description: "Search for people based on field, role, or keywords",
+  description: "Uses a user query on a broad subject such as job title or education and returns information about their LinkedIn profile and other information. ONLY use this tool to search for LinkedIn profiles based on keywords, job titles, or companies. This tool performs initial discovery of profiles but does NOT provide enriched data or allow sending invitations.",
   input: z.object({
-    query: z.string(),
-    limit: z.number().optional().default(5),
+    query: z.string().describe("Search keywords like job title, company name, or skills"),
+    limit: z.number().optional().default(5).describe("Maximum number of results to return (default: 5)"),
+    searchPurpose: z.enum(["general_search", "research"]).default("general_search")
+      .describe("Purpose of the search - use 'general_search' for basic profile discovery")
   }),
   output: z.object({
     message: z.string(),
