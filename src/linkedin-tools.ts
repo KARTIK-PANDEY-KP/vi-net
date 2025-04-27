@@ -3,6 +3,28 @@ import { ToolConfig } from "@dainprotocol/service-sdk";
 import { FormUIBuilder, CardUIBuilder, TableUIBuilder, DainResponse } from "@dainprotocol/utils";
 import { searchLinkedInUsers, fetchLinkedInProfiles } from "./linkedin-service";
 import { sendGmailInvitations } from "./gmail-service";
+import { enforceOnboarding } from "./utils";
+
+// Define output schemas
+const linkedInSearchOutputSchema = z.object({
+  message: z.string(),
+  profiles: z.array(z.object({
+    name: z.string(),
+    title: z.string(),
+    email: z.string().optional(),
+    profileUrl: z.string().optional(),
+    profilePicture: z.string().optional(),
+  })),
+});
+
+const scheduleCoffeeChatOutputSchema = z.object({
+  message: z.string(),
+  invitedProfiles: z.array(z.object({
+    name: z.string(),
+    title: z.string(),
+    email: z.string(),
+  })),
+});
 
 // LinkedIn Search Tool Configuration
 export const linkedInSearchConfig: ToolConfig = {
@@ -15,18 +37,13 @@ export const linkedInSearchConfig: ToolConfig = {
     searchPurpose: z.enum(["general_search", "research"]).default("general_search")
       .describe("Purpose of the search - use 'general_search' for basic profile discovery")
   }),
-  output: z.object({
-    message: z.string(),
-    profiles: z.array(z.object({
-      name: z.string(),
-      title: z.string(),
-      email: z.string().optional(),
-      profileUrl: z.string().optional(),
-      profilePicture: z.string().optional(),
-    })),
-  }),
-  handler: async ({ query, limit }, agentInfo) => {
+  output: linkedInSearchOutputSchema,
+  handler: enforceOnboarding(async ({ query, limit }, agentInfo) => {
+    process.stdout.write('[LINKEDIN SEARCH] Starting handler with enforceOnboarding\n');
+    process.stdout.write(`[LINKEDIN SEARCH] Agent Info: ${JSON.stringify(agentInfo)}\n`);
+    
     if (!query) {
+      process.stdout.write('[LINKEDIN SEARCH] No query provided, showing form\n');
       const formUI = new FormUIBuilder()
         .title("LinkedIn Profile Search")
         .addFields([
@@ -60,7 +77,8 @@ export const linkedInSearchConfig: ToolConfig = {
     }
 
     try {
-      console.log(`[LINKD SEARCH TOOL] Starting search for query: "${query}" with limit: ${limit}`);
+      process.stdout.write('[LINKEDIN SEARCH] Query provided, proceeding with search\n');
+      process.stdout.write(`[LINKD SEARCH TOOL] Starting search for query: "${query}" with limit: ${limit}\n`);
       
       // Search LinkedIn profiles
       const profiles = await searchLinkedInUsers(query, limit);
@@ -115,7 +133,7 @@ export const linkedInSearchConfig: ToolConfig = {
         ui: errorCard,
       });
     }
-  },
+  }, linkedInSearchOutputSchema)
 };
 
 // Schedule Coffee Chat Tool Configuration
@@ -128,15 +146,8 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
     resumeUrl: z.string().url(),
     preferredChatPartner: z.string(),
   }),
-  output: z.object({
-    message: z.string(),
-    invitedProfiles: z.array(z.object({
-      name: z.string(),
-      title: z.string(),
-      email: z.string(),
-    })),
-  }),
-  handler: async ({ googleMeetLink, resumeUrl, preferredChatPartner }, agentInfo) => {
+  output: scheduleCoffeeChatOutputSchema,
+  handler: enforceOnboarding(async ({ googleMeetLink, resumeUrl, preferredChatPartner }, agentInfo) => {
     if (!googleMeetLink || !resumeUrl || !preferredChatPartner) {
       const formUI = new FormUIBuilder()
         .title("Schedule Coffee Chat")
@@ -275,5 +286,5 @@ export const scheduleCoffeeChatConfig: ToolConfig = {
         ui: errorCard,
       });
     }
-  },
+  }, scheduleCoffeeChatOutputSchema)
 };

@@ -3,3 +3,6 @@
 .env.development
 package-lock.json
 .env
+
+firestore-creds.json
+GCP_gmail_api_credentials.json

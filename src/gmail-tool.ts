@@ -2,6 +2,13 @@ import { z } from "zod";
 import { ToolConfig } from "@dainprotocol/service-sdk";
 import { FormUIBuilder, CardUIBuilder, DainResponse } from "@dainprotocol/utils";
 import { sendGmailEmail } from "./gmail-service";
+import { enforceOnboarding } from "./utils";
+
+// Define output schema
+const sendEmailOutputSchema = z.object({
+  success: z.boolean(),
+  messageId: z.string().optional()
+});
 
 // Gmail Send Email Tool Configuration
 export const sendEmailConfig: ToolConfig = {
@@ -13,11 +20,8 @@ export const sendEmailConfig: ToolConfig = {
     subject: z.string(),
     body: z.string()
   }),
-  output: z.object({
-    success: z.boolean(),
-    messageId: z.string().optional()
-  }),
-  handler: async ({ to, subject, body }, agentInfo) => {
+  output: sendEmailOutputSchema,
+  handler: enforceOnboarding(async ({ to, subject, body }, agentInfo) => {
     if (!to || !subject || !body) {
       const formUI = new FormUIBuilder()
         .title("Send Email")
@@ -60,48 +64,27 @@ export const sendEmailConfig: ToolConfig = {
     try {
       const result = await sendGmailEmail(agentInfo.id, to, subject, body);
       
-      if (result.success) {
-        const successCard = new CardUIBuilder()
-          .title("Email Sent")
-          .content(`
-            Your email has been sent successfully!
-            
-            To: ${to}
-            Subject: ${subject}
-          `)
-          .build();
-        
-        return new DainResponse({
-          text: "Email sent successfully",
-          data: {
-            success: true,
-            messageId: result.messageId
-          },
-          ui: successCard,
-        });
-      } else {
-        const errorCard = new CardUIBuilder()
-          .title("Email Sending Failed")
-          .content(`
-            There was an error sending your email.
-            
-            Please check your Gmail connection or try again later.
-          `)
-          .build();
-        
-        return new DainResponse({
-          text: "Failed to send email",
-          data: {
-            success: false
-          },
-          ui: errorCard,
-        });
-      }
+      const successCard = new CardUIBuilder()
+        .title("Email Sent Successfully")
+        .content(`
+          Your email has been sent successfully!
+          
+          To: ${to}
+          Subject: ${subject}
+          Message ID: ${result.messageId}
+        `)
+        .build();
+
+      return new DainResponse({
+        text: "Email sent successfully",
+        data: result,
+        ui: successCard,
+      });
     } catch (error) {
-      console.error('[GMAIL TOOL] Error sending email:', error);
+      console.error(`[GMAIL TOOL] Error sending email: ${error.message}`);
       
       const errorCard = new CardUIBuilder()
-        .title("Email Error")
+        .title("Error Sending Email")
         .content(`
           An error occurred while sending your email:
           
@@ -114,10 +97,11 @@ export const sendEmailConfig: ToolConfig = {
       return new DainResponse({
         text: `Error sending email: ${error.message}`,
         data: {
-          success: false
+          success: false,
+          message: error.message
         },
         ui: errorCard,
       });
     }
-  }
+  }, sendEmailOutputSchema)
 };

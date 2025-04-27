@@ -13,6 +13,7 @@ import { linkedInProfileDataConfig } from './linkedin-profile-data-tool';
 
 // Create express app for webhooks
 const app = express();
+import { onboardingTool, getUserDataTool, updateUserProfileTool } from './onboard';
 
 // DAIN Service Definition
 const dainService = defineDAINService({
@@ -73,11 +74,15 @@ const dainService = defineDAINService({
   },
   // Add all tool configurations
   tools: [
-    linkedInSearchConfig, 
-    scheduleCoffeeChatConfig, 
     sendEmailConfig,
     profileEnrichmentConfig,
     linkedInProfileDataConfig
+    linkedInSearchConfig,
+    scheduleCoffeeChatConfig,
+    profileEnrichmentConfig,
+    onboardingTool,
+    getUserDataTool,
+    updateUserProfileTool
   ],
   // Add context for storing OAuth tokens
   contexts: [
