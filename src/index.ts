@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { defineDAINService } from "@dainprotocol/service-sdk";
+import express from "express";
 
 // Import OAuth and token context
 import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
@@ -8,6 +9,12 @@ import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
 import { sendEmailConfig } from './gmail-tool';
 import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools';
 import { profileEnrichmentConfig } from './profile-enrichment-tool';
+
+// Import SignalHire webhook
+import { initializeSignalHireWebhook } from './signalhire-webhook';
+
+// Create express app for webhooks
+const app = express();
 
 // DAIN Service Definition
 const dainService = defineDAINService({
@@ -87,7 +94,23 @@ const dainService = defineDAINService({
   }
 });
 
-// Start the service
+// Initialize SignalHire webhook
+initializeSignalHireWebhook(app);
+
+// Start the service with both DAIN service and webhook support
+const WEBHOOK_PORT = parseInt(process.env.WEBHOOK_PORT || '3000');
+
+// Start the express app for webhooks on a different port than the DAIN service
+app.listen(WEBHOOK_PORT, () => {
+  console.log(`Webhook server is running on port ${WEBHOOK_PORT}`);
+});
+
+// Start the DAIN service (this will use the port already assigned by the DAIN system)
 dainService.startNode().then(({ address }) => {
-  console.log("DAIN LinkedIn & Gmail Service is running at port:" + address().port);
+  const dainPort = address().port;
+  console.log(`DAIN LinkedIn & Gmail Service is running at port: ${dainPort}`);
+  
+  // Use the TUNNEL_URL if provided, otherwise use localhost with the webhook port
+  const baseUrl = process.env.TUNNEL_URL || `http://localhost:${WEBHOOK_PORT}`;
+  console.log(`Make sure to set your SignalHire callback URL to: ${baseUrl}/signalhire/callback`);
 });

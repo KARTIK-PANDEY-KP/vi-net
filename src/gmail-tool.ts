@@ -7,7 +7,7 @@ import { sendGmailEmail } from "./gmail-service";
 export const sendEmailConfig: ToolConfig = {
   id: "send-email",
   name: "Send Email",
-  description: "Sends an email using the user's Gmail account",
+  description: "Sends an email using the user's Gmail account based on a linkedIn profile",
   input: z.object({
     to: z.string().email(),
     subject: z.string(),
