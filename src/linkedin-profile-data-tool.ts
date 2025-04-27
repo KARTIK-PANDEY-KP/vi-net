@@ -108,6 +108,7 @@ export const linkedInProfileDataConfig: ToolConfig = {
           { key: "label", header: "Attribute", type: "string" },
           { key: "value", header: "Value", type: "string" },
         ])
+        .setRenderMode('page')
         .rows(profileDetails)
         .build();
       

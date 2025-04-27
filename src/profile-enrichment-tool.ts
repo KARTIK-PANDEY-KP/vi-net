@@ -25,7 +25,7 @@ const profileEnrichmentOutputSchema = z.object({
 // LinkedIn Profile Enrichment Tool
 export const profileEnrichmentConfig: ToolConfig = {
   id: "profile-enrichment",
-  name: "Find User's LinkedIn Profile",
+  name: "Research LinkedIn Profile",
   description: "This tool takes in a LinkedIn URL and returns detailed information about their profile. ONLY use this tool when the user needs detailed information about specific LinkedIn profiles to personalize outreach. This tool gets additional data beyond basic profile details, such as talking points, skills, interests, and education.",
   input: z.object({
     query: z.string().describe("Search query to find specific profiles that need enrichment"),

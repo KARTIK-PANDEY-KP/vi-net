@@ -326,11 +326,3 @@ export async function fetchLinkedInProfiles(preferredChatPartner: string): Promi
   // Just use the searchLinkedInUsers function with a limit of 3
   return searchLinkedInUsers(preferredChatPartner, 3);
 }
-
-// Simulated function to send emails via Gmail
-export async function sendGmailInvitations(meetLink: string, scheduleLink: string, resumeUrl: string, recipients: any[]): Promise<void> {
-  // In a real scenario, this would use the Gmail API to send emails
-  console.log(`Sending invitations to ${recipients.length} recipients`);
-  console.log(`Meet Link: ${meetLink}`);
-  console.log(`Resume URL: ${resumeUrl}`);
-} 
