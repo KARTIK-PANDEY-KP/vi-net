@@ -9,6 +9,7 @@ import { oauthTokensContext, storeGoogleTokens } from './auth-utils';
 import { sendEmailConfig } from './gmail-tool';
 import { linkedInSearchConfig, scheduleCoffeeChatConfig } from './linkedin-tools';
 import { profileEnrichmentConfig } from './profile-enrichment-tool';
+import { linkedInProfileDataConfig } from './linkedin-profile-data-tool';
 
 // Import SignalHire webhook
 import { initializeSignalHireWebhook } from './signalhire-webhook';
@@ -59,7 +60,16 @@ const dainService = defineDAINService({
         "Find personalization details for CTOs in healthcare",
         "Research VPs of Engineering for outreach",
       ],
-    }
+    },
+    {
+      category: "Profile Data",
+      queries: [
+        "Give me the profile data for https://www.linkedin.com/in/someprofile",
+        "Get detailed information about this LinkedIn profile: https://linkedin.com/in/username",
+        "What can you tell me about https://www.linkedin.com/in/personname",
+        "Can you show me information about this LinkedIn profile:"
+      ],
+    },
   ],
   identity: {
     apiKey: process.env.DAIN_API_KEY,
@@ -69,7 +79,8 @@ const dainService = defineDAINService({
     linkedInSearchConfig, 
     scheduleCoffeeChatConfig, 
     sendEmailConfig,
-    profileEnrichmentConfig
+    profileEnrichmentConfig,
+    linkedInProfileDataConfig
   ],
   // Add context for storing OAuth tokens
   contexts: [

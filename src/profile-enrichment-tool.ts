@@ -7,8 +7,8 @@ import { getDetailedProfilesInfo, extractTalkingPoints } from "./linkedin-profil
 // LinkedIn Profile Enrichment Tool
 export const profileEnrichmentConfig: ToolConfig = {
   id: "profile-enrichment",
-  name: "LinkedIn Profile Enrichment",
-  description: "Get detailed LinkedIn profile information to personalize your outreach",
+  name: "Find User's LinkedIn Profile",
+  description: "Query for a specific LinkedIn profile given a query (job title, company, keywords, school)",
   input: z.object({
     query: z.string(),
     limit: z.number().optional().default(3),

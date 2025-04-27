@@ -1,0 +1,58 @@
+[
+    {
+      "prompt": "Give me the profile data for https://www.linkedin.com/in/johndoe",
+      "toolName": "linkedin-profile-data",
+      "params": {
+        "linkedinUrl": "https://www.linkedin.com/in/johndoe"
+      },
+      "explanation": "Direct request for profile data with a LinkedIn URL"
+    },
+    {
+      "prompt": "Can you show me information about this LinkedIn profile: https://linkedin.com/in/janedoe",
+      "toolName": "linkedin-profile-data",
+      "params": {
+        "linkedinUrl": "https://linkedin.com/in/janedoe"
+      },
+      "explanation": "Request for information about a LinkedIn profile"
+    },
+    {
+      "prompt": "What can you tell me about https://www.linkedin.com/in/bobsmith",
+      "toolName": "linkedin-profile-data",
+      "params": {
+        "linkedinUrl": "https://www.linkedin.com/in/bobsmith"
+      },
+      "explanation": "Open question about a LinkedIn profile"
+    },
+    {
+      "prompt": "Find details for this profile: linkedin.com/in/sarahlee",
+      "toolName": "linkedin-profile-data",
+      "params": {
+        "linkedinUrl": "https://linkedin.com/in/sarahlee"
+      },
+      "explanation": "Request for profile details with a LinkedIn URL that's missing the protocol"
+    },
+    {
+      "prompt": "I need data on www.linkedin.com/in/mikejones",
+      "toolName": "linkedin-profile-data",
+      "params": {
+        "linkedinUrl": "https://www.linkedin.com/in/mikejones"
+      },
+      "explanation": "Request for data on a LinkedIn profile"
+    },
+    {
+      "prompt": "Get me professional information about linkedin.com/in/emmawilson",
+      "toolName": "linkedin-profile-data",
+      "params": {
+        "linkedinUrl": "https://linkedin.com/in/emmawilson"
+      },
+      "explanation": "Request for professional information with a LinkedIn URL"
+    },
+    {
+      "prompt": "Tell me what SignalHire knows about https://www.linkedin.com/in/davidbrown",
+      "toolName": "linkedin-profile-data",
+      "params": {
+        "linkedinUrl": "https://www.linkedin.com/in/davidbrown"
+      },
+      "explanation": "Request explicitly mentioning SignalHire with a LinkedIn URL"
+    }
+  ]
